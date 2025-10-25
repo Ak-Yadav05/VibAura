@@ -1,0 +1,6 @@
+# Future Node.js dependencies
+node_modules/
+
+# OS-specific files
+.DS_Store
+Thumbs.db

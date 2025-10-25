@@ -1,0 +1,155 @@
+.fullscreen-player {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: linear-gradient(135deg, var(--color-gradient-start), var(--color-gradient-end));
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  transform: translateY(100%);
+  transition: transform 0.4s cubic-bezier(.4, 0, .2, 1);
+}
+
+.fullscreen-player.open {
+  transform: translateY(0);
+}
+
+.fullscreen-player-header {
+  padding: 15px;
+}
+
+.close-fullscreen-btn svg,
+.close-fullscreen-btn img {
+  width: 32px;
+  height: 32px;
+}
+
+.fullscreen-player-body {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 20px;
+}
+
+.album-art-disc {
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  margin-top: 0;
+}
+
+.album-art-disc img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.album-art-disc.playing {
+  animation: rotate 20s linear infinite;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.fs-info-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 400px;
+}
+
+.song-details-large {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.song-details-large .song-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  display: block;
+}
+
+.song-details-large .song-artist {
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+  display: block;
+}
+
+.progress-container-large {
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.progress-bar-wrapper {
+  width: 100%;
+}
+
+.progress-bar-wrapper input[type="range"].progress-bar {
+  width: 100%;
+  height: 4px;
+  margin: 0;
+}
+
+.progress-bar-wrapper input[type="range"].progress-bar::-webkit-slider-thumb {
+  height: 12px;
+  width: 12px;
+  margin-top: -4px;
+}
+
+.progress-bar-wrapper input[type="range"].progress-bar::-moz-range-thumb {
+  height: 12px;
+  width: 12px;
+}
+
+.time-display-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.time-display-wrapper .time-current,
+.time-display-wrapper .time-total {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+}
+
+.control-buttons-large {
+  width: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 0;
+  margin-top: -20px;
+}
+
+.center-controls {
+  display: contents;
+}
+
+.control-buttons-large .player-btn img {
+  width: 35px;
+  height: 35px;
+}
+
+.control-buttons-large .play-pause-btn img {
+  width: 50px;
+  height: 50px;
+}
