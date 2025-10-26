@@ -1,0 +1,25 @@
+{
+  "name": "vibaura",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ak-Yadav05/VibAura.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Ak-Yadav05/VibAura/issues"
+  },
+  "homepage": "https://github.com/Ak-Yadav05/VibAura#readme",
+  "description": "",
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "mongoose": "^8.19.2"
+  }
+}

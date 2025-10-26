@@ -1,5 +1,15 @@
-# Future Node.js dependencies
+# Node.js dependencies
 node_modules/
+
+# Environment variables (for secrets like passwords)
+.env
+
+# Log files
+*.log
+logs/
+
+# Editor-specific files
+.vscode/
 
 # OS-specific files
 .DS_Store
