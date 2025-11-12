@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VibAura</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="css/base/skeleton.css" />
+    <link rel="stylesheet" href="css/base/splash.css" />
+    <link rel="stylesheet" href="css/components/search.css" />
+    <link rel="stylesheet" href="css/search-page.css" />
+    <link rel="stylesheet" href="css/desktop.css" media="(min-width: 769px)" />
+    <link rel="stylesheet" href="css/mobile.css" media="(max-width: 768px)" />
+
+    <style>
+      .splash-screen {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #ffffff;
+        z-index: 10000;
+        pointer-events: none;
+      }
+      .splash-logo {
+        width: 160px;
+        height: 160px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .splash-logo img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+      .splash-brand {
+        font-size: 56px;
+        font-weight: 700;
+        letter-spacing: 1.2px;
+        color: #2d3748;
+        font-family: "Jost", sans-serif;
+      }
+      body.dark-theme .splash-screen {
+        background-color: #1a202c;
+      }
+      body.dark-theme .splash-brand {
+        color: #f7fafc;
+      }
+    </style>
+  </head>
+
+  <body>
+    <script>
+      (function () {
+        // Get saved theme preference or detect system preference
+        const savedTheme = localStorage.getItem("vibAuraTheme");
+        const prefersDark = window.matchMedia(
+          "(prefers-color-scheme: dark)"
+        ).matches;
+
+        // Determine which theme to apply
+        const shouldBeDark = savedTheme ? savedTheme === "dark" : prefersDark;
+
+        // Apply theme before anything renders
+        if (shouldBeDark) {
+          document.body.classList.add("dark-theme");
+        } else {
+          document.body.classList.remove("dark-theme");
+        }
+      })();
+    </script>
+
+    <div class="splash-screen" id="splash-screen">
+      <div class="splash-content">
+        <div class="logo splash-logo">
+          <img src="images/music.png" alt="VibAura Logo" />
+        </div>
+        <span class="brand-name splash-brand">VibAura</span>
+      </div>
+    </div>
+
+    <div class="container">
+      <header class="mobile-header">
+        <div class="nav-left">
+          <div class="logo">
+            <img src="images/music.png" alt="VibAura Logo" />
+          </div>
+          <span class="brand-name">VibAura</span>
+        </div>
+
+        <div class="nav-right">
+          <div class="theme-toggle" id="mobile-theme-toggle">
+            <img src="images/icons/sun.png" class="sun-icon" alt="Sun Icon" />
+            <img
+              src="images/icons/moon.png"
+              class="moon-icon"
+              style="display: none"
+              alt="Moon Icon"
+            />
+          </div>
+          <div class="user-profile">
+            <img
+              src="https://placehold.co/32x32/DBEAFE/2563EB?text=A"
+              alt="User Avatar"
+            />
+          </div>
+        </div>
+      </header>
+
+      <header class="nav">
+        <div class="nav-left">
+          <div class="logo">
+            <img src="images/music.png" alt="VibAura Logo" />
+          </div>
+          <span class="brand-name">VibAura</span>
+        </div>
+
+        <div class="nav-controls">
+          <button
+            class="icon-btn"
+            aria-label="Go back"
+            onclick="window.history.back()"
+          >
+            <img src="images/icons/back.png" alt="Back" />
+          </button>
+          <button
+            class="icon-btn"
+            aria-label="Go forward"
+            onclick="window.history.forward()"
+          >
+            <img src="images/icons/forward.png" alt="Forward" />
+          </button>
+          <a href="#" class="icon-btn" id="nav-home" aria-label="Home">
+            <img src="images/icons/home.png" alt="Home" />
+          </a>
+        </div>
+
+        <div class="search-bar">
+          <img src="images/icons/search.png" alt="Search" />
+          <input
+            type="text"
+            placeholder="What do you want to play?"
+            id="search-input"
+          />
+        </div>
+
+        <div class="nav-right">
+          <div class="theme-toggle icon-btn" id="theme-toggle">
+            <img src="images/icons/sun.png" class="sun-icon" alt="Sun Icon" />
+            <img
+              src="images/icons/moon.png"
+              class="moon-icon"
+              style="display: none"
+              alt="Moon Icon"
+            />
+          </div>
+          <div class="user-profile">
+            <img
+              src="https://placehold.co/32x32/DBEAFE/2563EB?text=A"
+              alt="User Avatar"
+            />
+            <span>User</span>
+          </div>
+        </div>
+      </header>
+
+      <main class="main">
+        <aside class="library" id="libraryMenu">
+          <div class="library-header">
+            <h2 class="library-title">Your Library</h2>
+          </div>
+
+          <ul class="library-list">
+            <li class="library-item">
+              <img
+                src="https://placehold.co/64x64/8B5CF6/FFFFFF?text=♥"
+                alt="Liked Songs"
+                class="library-item-img"
+              />
+              <div class="library-item-info">
+                <span class="library-item-title">Liked Songs</span>
+                <span class="library-item-subtitle">Playlist • 20 songs</span>
+              </div>
+            </li>
+
+            <li class="library-item">
+              <img
+                src="https://placehold.co/64x64/EAB308/000000?text=P1"
+                alt="My Playlist #1"
+                class="library-item-img"
+              />
+              <div class="library-item-info">
+                <span class="library-item-title">My Playlist #1</span>
+                <span class="library-item-subtitle">Playlist • Artist</span>
+              </div>
+            </li>
+
+            <li class="library-item">
+              <img
+                src="https://placehold.co/64x64/22C55E/FFFFFF?text=WM"
+                alt="Workout Mix"
+                class="library-item-img"
+              />
+              <div class="library-item-info">
+                <span class="library-item-title">Workout Mix</span>
+                <span class="library-item-subtitle">Playlist • Artist</span>
+              </div>
+            </li>
+
+            <li class="library-item">
+              <img
+                src="https://placehold.co/64x64/3B82F6/FFFFFF?text=CV"
+                alt="Chill Vibes"
+                class="library-item-img"
+              />
+              <div class="library-item-info">
+                <span class="library-item-title">Chill Vibes</span>
+                <span class="library-item-subtitle">Playlist • Artist</span>
+              </div>
+            </li>
+
+            <li class="library-item">
+              <img
+                src="https://placehold.co/64x64/EC4899/FFFFFF?text=RT"
+                alt="Road Trip"
+                class="library-item-img"
+              />
+              <div class="library-item-info">
+                <span class="library-item-title">Road Trip</span>
+                <span class="library-item-subtitle">Playlist • Artist</span>
+              </div>
+            </li>
+          </ul>
+        </aside>
+
+        <section class="content">
+          <div id="album-sections"></div>
+        </section>
+      </main>
+    </div>
+
+    <div class="player-container">
+      <div class="player">
+        <div class="song-info-wrapper">
+          <div class="song-info">
+            <img
+              src="https://placehold.co/60x60/E5E7EB/1E1E1E?text=Album"
+              alt="Album Art"
+              class="song-album-art"
+            />
+            <div class="song-details">
+              <span class="song-title">Select a Song</span>
+              <span class="song-artist"></span>
+            </div>
+          </div>
+          <button class="player-btn favorite-btn" id="favorite-btn">
+            <img src="images/media controls/favourite.png" alt="Favorite" />
+          </button>
+        </div>
+
+        <div class="player-controls">
+          <div class="control-buttons">
+            <button class="player-btn" id="shuffle-btn">
+              <img src="images/media controls/shuffle.png" alt="Shuffle" />
+            </button>
+            <button class="player-btn" id="prev-btn">
+              <img src="images/media controls/previous.png" alt="Previous" />
+            </button>
+            <button class="player-btn play-pause-btn" id="play-pause-btn">
+              <img
+                src="images/media controls/play.png"
+                class="play-icon"
+                alt="Play"
+              />
+              <img
+                src="images/media controls/pause.png"
+                class="pause-icon"
+                style="display: none"
+                alt="Pause"
+              />
+            </button>
+            <button class="player-btn" id="next-btn">
+              <img src="images/media controls/next.png" alt="Next" />
+            </button>
+            <button class="player-btn" id="repeat-btn">
+              <img src="images/media controls/repeat.png" alt="Repeat" />
+            </button>
+          </div>
+
+          <div class="progress-container">
+            <span class="time-current">0:00</span>
+            <input
+              type="range"
+              class="progress-bar"
+              id="progress-bar"
+              value="0"
+              min="0"
+              max="100"
+              step="1"
+            />
+            <span class="time-total">0:00</span>
+          </div>
+        </div>
+
+        <div class="volume-controls">
+          <button class="player-btn" id="open-fullscreen-btn">
+            <img src="images/icons/fullscreen.png" alt="Fullscreen" />
+          </button>
+          <button class="player-btn" id="volume-btn">
+            <img src="images/icons/volume-up.png" alt="Volume" />
+          </button>
+          <input
+            type="range"
+            class="volume-slider"
+            id="volume-slider"
+            value="100"
+            min="0"
+            max="100"
+            step="1"
+          />
+        </div>
+      </div>
+    </div>
+
+    <footer class="mobile-nav">
+      <nav class="nav-links">
+        <ul>
+          <li>
+            <a href="#" class="nav-link active">
+              <img src="images/icons/home.png" alt="Home" /> Home
+            </a>
+          </li>
+          <li>
+            <a href="#search" class="nav-link">
+              <img src="images/icons/search.png" alt="Search" /> Search
+            </a>
+          </li>
+          <li>
+            <a href="#library" class="nav-link">
+              <img src="images/icons/library.png" alt="Library" /> Library
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </footer>
+
+    <audio id="audio-player"></audio>
+
+    <div class="fullscreen-player" id="fullscreen-player">
+      <div class="fullscreen-player-header">
+        <button
+          class="player-btn close-fullscreen-btn"
+          id="close-fullscreen-btn"
+        >
+          <img src="images/icons/exit-fullscreen.png" alt="Exit Fullscreen" />
+        </button>
+      </div>
+
+      <div class="fullscreen-player-body">
+        <div class="album-art-disc" id="fullscreen-album-art-disc">
+          <img
+            src="https://placehold.co/300x300/E5E7EB/1E1E1E?text=Album"
+            alt="Album Art"
+            class="song-album-art"
+            id="fullscreen-album-art"
+          />
+        </div>
+
+        <div class="fs-info-container">
+          <div class="song-details-large">
+            <span class="song-title" id="fullscreen-song-title"
+              >Select a Song</span
+            >
+            <span class="song-artist" id="fullscreen-song-artist"></span>
+          </div>
+          <button class="player-btn" id="fullscreen-favorite-btn">
+            <img src="images/media controls/favourite.png" alt="Favorite" />
+          </button>
+        </div>
+
+        <div class="progress-container-large">
+          <div class="progress-bar-wrapper">
+            <input
+              type="range"
+              class="progress-bar"
+              id="fullscreen-progress-bar"
+              value="0"
+              min="0"
+              max="100"
+              step="1"
+            />
+          </div>
+          <div class="time-display-wrapper">
+            <span class="time-current" id="fullscreen-time-current">0:00</span>
+            <span class="time-total" id="fullscreen-time-total">0:00</span>
+          </div>
+        </div>
+
+        <div class="control-buttons-large">
+          <button class="player-btn" id="fullscreen-shuffle-btn">
+            <img src="images/media controls/shuffle.png" alt="Shuffle" />
+          </button>
+          <div class="center-controls">
+            <button class="player-btn" id="fullscreen-prev-btn">
+              <img src="images/media controls/previous.png" alt="Previous" />
+            </button>
+            <button
+              class="player-btn play-pause-btn"
+              id="fullscreen-play-pause-btn"
+            >
+              <img
+                src="images/media controls/play.png"
+                class="play-icon"
+                alt="Play"
+              />
+              <img
+                src="images/media controls/pause.png"
+                class="pause-icon"
+                style="display: none"
+                alt="Pause"
+              />
+            </button>
+            <button class="player-btn" id="fullscreen-next-btn">
+              <img src="images/media controls/next.png" alt="Next" />
+            </button>
+          </div>
+          <button class="player-btn" id="fullscreen-repeat-btn">
+            <img src="images/media controls/repeat.png" alt="Repeat" />
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        // Non-blocking: if the app properly manages the splash, these calls are no-ops.
+        const FALLBACK_MS = 3500;
+        setTimeout(() => {
+          try {
+            // Check if the main app's hide function exists
+            if (
+              window.hideSplashScreen &&
+              typeof window.hideSplashScreen === "function"
+            ) {
+              window.hideSplashScreen(); // Use the app's function
+              return;
+            }
+            // Fallback if the app function failed to load
+            const splash = document.getElementById("splash-screen");
+            if (!splash) return;
+            document.body.classList.remove("splash-active");
+            // Smoothly remove element
+            try {
+              splash.remove();
+            } catch (e) {
+              splash.style.display = "none";
+            }
+          } catch (e) {
+            // Don't throw; this is a best-effort fallback
+            console.warn("Splash fallback failed:", e);
+          }
+        }, FALLBACK_MS);
+      })();
+    </script>
+
+    <script type="module" src="../scripts/core/app.js"></script>
+  </body>
+</html>

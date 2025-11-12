@@ -1,0 +1,98 @@
+/**
+ * ============================================================================
+ * VibAura Skeleton Loading - Placeholder Animations
+ * ============================================================================
+ *
+ * Defines skeleton (placeholder) card styling for loading states.
+ * Shows while API content is being fetched, improving perceived performance.
+ *
+ * Features:
+ * - Shimmer animation effect (a moving gradient)
+ * - Responsive sizing (desktop: 180x180px, mobile: 140x140px)
+ * - Smooth fade-out transition when replaced with real content
+ * - Dark mode color support with CSS variables
+ * - 1.4 second animation duration for a smooth visual flow
+ * ============================================================================
+ */
+
+/**
+ * SKELETON CARD PLACEHOLDER
+ * Shows as a loading state before real content loads.
+ */
+.skeleton-card {
+  width: 180px;
+  height: 180px;
+  border-radius: 12px;
+  flex-shrink: 0; /* Prevents shrinking in the card container */
+  margin-right: 14px;
+
+  /* * Gradient background that shifts left-to-right (shimmer effect)
+   * The gradient is much wider than the element, and its position is animated.
+   */
+  background: linear-gradient(
+    90deg,
+    var(--skeleton-base) 25%,
+    var(--skeleton-highlight) 37%,
+    var(--skeleton-base) 63%
+  );
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease infinite;
+
+  /* Smooth transition for when it's replaced with real content */
+  transition: opacity 0.4s ease, transform 0.3s ease;
+}
+
+/**
+ * MOBILE RESPONSIVENESS
+ * Smaller cards on small screens
+ */
+@media (max-width: 768px) {
+  .skeleton-card {
+    width: 140px;
+    height: 140px;
+  }
+}
+
+/**
+ * FADE-OUT ANIMATION (Helper class)
+ * Can be applied when skeleton is replaced with real content.
+ */
+.skeleton-fade-out {
+  opacity: 0;
+  transform: scale(0.97);
+  pointer-events: none;
+}
+
+/**
+ * LIGHT MODE COLORS
+ * Light gray gradient for skeleton in light theme
+ */
+:root {
+  --skeleton-base: #ececec;
+  --skeleton-highlight: #f5f5f5;
+}
+
+/**
+ * DARK MODE COLORS
+ * Darker gray gradient for skeleton in dark theme
+ */
+body.dark-theme {
+  --skeleton-base: #2c2f3a;
+  --skeleton-highlight: #3b3f4a;
+}
+
+/**
+ * SHIMMER ANIMATION
+ * Creates the moving gradient effect by shifting the background-position
+ * from far left to far right.
+ */
+@keyframes shimmer {
+  0% {
+    /* Gradient starts off-screen to the left */
+    background-position: -468px 0;
+  }
+  100% {
+    /* Gradient ends off-screen to the right */
+    background-position: 468px 0;
+  }
+}

@@ -1,0 +1,142 @@
+/**
+ * ============================================================================
+ * VibAura Router - Client-side Navigation Handler
+ * ============================================================================
+ *
+ * Manages hash-based routing for single-page application (SPA) navigation.
+ * Handles route changes, updates active navigation states, and coordinates
+ * with the splash screen animation promise before rendering pages.
+ *
+ * Supported routes:
+ * - # or #home     : Home page with trending content
+ * - #library     : Library page (mobile-focused)
+ * - #search      : Search page (mobile-focused)
+ * - #/artist/:id  : Artist detail page
+ * - #/playlist/:id: Playlist detail page
+ * ============================================================================
+*/
+
+import {
+  renderHomePage,
+  renderArtistPage,
+  renderPlaylistPage,
+  renderLibraryPage,
+  renderSearchPage,
+} from "../ui/pageRenderer.js";
+
+// DOM elements for routing and navigation state
+const mobileHeader = document.querySelector(".mobile-header");
+const contentArea = document.querySelector(".content");
+
+// Desktop nav links (Note: #nav-library doesn't exist in the provided HTML)
+const desktopNavLinks = [
+  document.getElementById("nav-home"),
+  document.getElementById("nav-library"), // This ID might be missing in index.html
+];
+// Mobile bottom bar nav links
+const mobileNavLinks = document.querySelectorAll(".mobile-nav .nav-link");
+
+/**
+ * Main router function - Processes URL hash changes and renders the appropriate page.
+ *
+ * Features:
+ * - Updates active navigation states on desktop and mobile
+ * - Shows/hides mobile header based on the current route
+ * - Waits for splash screen animation to finish on initial homepage load
+ * - Routes to the correct page rendering function based on URL hash
+ *
+ * @async
+ * @exports router
+ * @returns {void}
+ */
+export async function router() {
+  const hash = window.location.hash;
+
+  console.log(`[Router] Processing route: ${hash || "(home)"}`);
+
+  // Update active state on desktop navigation links
+  desktopNavLinks.forEach((link) => {
+    if (!link) return; // Skip if link (e.g., #nav-library) isn't found
+
+    const linkHash = link.hash;
+    // Check if link's hash matches, or if it's the home link and hash is empty
+    if (linkHash === hash || (linkHash === "#" && hash === "")) {
+      link.classList.add("active");
+    } else {
+      link.classList.remove("active");
+    }
+  });
+
+  // Update active state on mobile navigation links
+  mobileNavLinks.forEach((link) => {
+    if (!link) return;
+
+    const linkHash = link.hash;
+    // Check if link's hash matches, or if it's the home link (#) and hash is empty
+    if (linkHash === hash || (linkHash === "#" && (hash === "" || hash === "#home"))) {
+      link.classList.add("active");
+    } else {
+      link.classList.remove("active");
+    }
+  });
+
+  // Show/hide header based on route for mobile responsiveness
+  // Library page hides header; all other pages show it
+  if (mobileHeader && contentArea) {
+    if (window.innerWidth <= 768) {
+      // Mobile view
+      if (hash === "#library") {
+        mobileHeader.style.display = "none";
+        contentArea.style.paddingTop = "20px";
+      } else {
+        mobileHeader.style.display = "flex";
+        contentArea.style.paddingTop = "75px";
+      }
+    } else {
+      // Reset to default styles for desktop view
+      mobileHeader.style.display = ""; // Resets to CSS default
+      contentArea.style.paddingTop = ""; // Resets to CSS default
+    }
+  }
+
+  // * Wait for splash screen animation to complete on *initial* homepage load.
+  // * The 'window.splashAnimationDone' promise is created in splashScreen.js
+  // * and resolves after the splash animation finishes or is skipped.
+  const isHomePage = hash === "" || hash === "#" || hash === "#home";
+  if (isHomePage) {
+    // This await ensures the homepage content only renders *after* the splash is gone.
+    await window.splashAnimationDone;
+  }
+
+  // Route to appropriate page based on URL hash
+  console.log(`[Router] Hash value: "${hash}"`);
+
+  if (hash === "#library") {
+    // --- Library Page (Mobile) ---
+    console.log("[Router] Rendering library page");
+    renderLibraryPage();
+  } else if (hash === "#search") {
+    // --- Search Page (Mobile) ---
+    console.log("[Router] Rendering search page");
+    renderSearchPage();
+  } else if (hash.startsWith("#/artist/")) {
+    // --- Artist Detail Page ---
+    const artistId = hash.substring(9); // Get the ID after "#/artist/"
+    console.log(`[Router] Rendering artist page for ID: ${artistId}`);
+    renderArtistPage(artistId);
+  } else if (hash.startsWith("#/playlist/")) {
+    // --- Playlist Detail Page ---
+    const playlistId = hash.substring(11); // Get the ID after "#/playlist/"
+    console.log(`[Router] Rendering playlist page for ID: ${playlistId}`);
+    renderPlaylistPage(playlistId);
+  } else {
+    // --- Home Page (Default) ---
+    // Default to home page for root hash (#), empty hash, or unrecognized routes
+    console.log("[Router] Rendering home page (default)");
+    renderHomePage();
+  }
+}
+
+// Initialize router on page load (DOMContentLoaded) and listen for hash changes
+window.addEventListener("DOMContentLoaded", router);
+window.addEventListener("hashchange", router);

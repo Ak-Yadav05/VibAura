@@ -1,0 +1,125 @@
+/*
+ * ============================================================================
+ * VibAura Library Sidebar - Styling (Desktop)
+ * ============================================================================
+ *
+ * Defines the styles for the left-hand navigation sidebar ("Your Library").
+ * This component is typically visible on desktop layouts and hidden on mobile.
+ *
+ * Features:
+ * - Fixed-width sidebar with vertical flex layout
+ * - Scrollable list for library items
+ * - Custom scrollbar styling
+ * - Hover effects for interactive items
+ * - Ellipsis for overflowing text
+ * ============================================================================
+ */
+
+.library {
+  width: 20%; /* Takes 20% of the main content width on desktop */
+  background-color: var(--color-background-sidebar);
+  border-right: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  height: 100%;
+  overflow-y: hidden; /* Main container doesn't scroll; .library-list does */
+  padding: 0 12px;
+}
+
+.library-header {
+  display: flex;
+  align-items: center;
+  padding-top: 16px;
+  padding-left: 12px;
+}
+
+.library-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  margin: 0;
+  padding: 0;
+}
+
+/* * Main list for playlists, albums, etc.
+ * Fills remaining height and becomes scrollable.
+ */
+.library-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto; /* Enables scrolling for this list only */
+  height: 100%; /* Fills the remaining height of the .library container */
+  padding-right: 4px; /* Space for scrollbar */
+}
+
+/* Scrollbar styling (WebKit browsers - Chrome, Safari) */
+.library-list::-webkit-scrollbar {
+  width: 8px;
+}
+.library-list::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 4px;
+}
+body.dark-theme .library-list::-webkit-scrollbar-thumb {
+  background: var(--color-background-muted);
+}
+
+/* Individual item in the library list (e.g., a single playlist) */
+.library-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+/* Hover state for library items */
+.library-item:hover {
+  background-color: var(--color-background-muted);
+}
+
+body.dark-theme .library-item:hover {
+  background-color: var(--color-background-muted);
+}
+
+/* Album/Playlist artwork */
+.library-item-img {
+  width: 56px;
+  height: 56px;
+  border-radius: 6px;
+  object-fit: cover;
+  flex-shrink: 0; /* Prevents image from shrinking */
+}
+
+/* Container for text (title and subtitle) */
+.library-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden; /* Enables text-overflow ellipsis */
+  min-width: 0; /* Required for flexbox ellipsis to work */
+}
+
+/* Main title (e.g., Playlist name) */
+.library-item-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Subtitle (e.g., "Playlist • Artist") */
+.library-item-subtitle {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

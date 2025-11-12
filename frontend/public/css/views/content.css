@@ -1,0 +1,333 @@
+/*
+ * ============================================================================
+ * VibAura Main Content Area - Styling
+ * ============================================================================
+ *
+ * Styles for the main content section, including:
+ * - Horizontal scrolling card containers (albums, artists)
+ * - Scroll buttons (left/right)
+ * - Artist/Playlist detail page headers
+ * - Song list tables
+ * ============================================================================
+ */
+
+/* * Main content container (right side on desktop, full-width on mobile)
+ * This is the main scrollable area for the application.
+ */
+.content {
+  width: 80%; /* Desktop width (20% is for the library sidebar) */
+  padding: 30px 5px 0 20px;
+  height: 100%;
+  overflow-y: auto; /* Enables vertical scrolling for the page content */
+  position: relative;
+}
+
+/* * Wrapper for a single horizontal card section (e.g., "Trending Albums")
+ * This wrapper is used to position the scroll buttons relative to the card container.
+ */
+.wrapper {
+  position: relative;
+  width: 100%;
+  height: 230px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 35px;
+}
+
+/* Container for the horizontally scrolling cards */
+.card-container {
+  display: flex;
+  gap: 24px;
+  overflow-x: auto; /* Enables horizontal scrolling */
+  white-space: nowrap; /* Keeps cards in a single line */
+  scroll-behavior: smooth; /* Smooth scrolling on button click */
+  padding-top: 20px;
+  padding-left: 10px;
+  border-radius: 10px;
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 5px;
+}
+
+/* Hide horizontal scrollbar (WebKit) */
+.card-container::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide horizontal scrollbar (Firefox) */
+.card-container {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+/* Individual card (Album, Artist, Playlist) */
+.card {
+  flex: 0 0 auto; /* Prevents shrinking, fixed width */
+  width: 200px;
+  height: 240px;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+/* * Apply hover effects only on devices that can hover (not touch)
+ * This prevents sticky hover states on mobile.
+ */
+@media (hover: hover) {
+  .card:hover {
+    background: var(--color-background-muted);
+    transform: translateY(-8px); /* Lifts card on hover */
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* Click/tap feedback */
+.card:active {
+  transform: scale(0.97) translateY(-2px);
+}
+
+/* Horizontal scroll buttons (◀ ▶) */
+.scroll-btn {
+  display: none; /* Hidden by default, shown on .wrapper hover */
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  padding: 16px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 22px;
+  z-index: 10;
+}
+
+/* Class added by JS to show buttons */
+.wrapper.show-buttons .scroll-btn {
+  display: block;
+}
+
+.scroll-btn:hover {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.scroll-left {
+  left: 0;
+}
+
+.scroll-right {
+  right: 0;
+}
+
+/* * Container for all content sections (e.g., "Trending", "New Releases")
+ * This element is injected into by pageRenderer.js
+ */
+#album-sections {
+  margin-bottom: 90px; /* Padding to avoid player overlap at the bottom */
+}
+
+.album-img {
+  width: 180px;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.card-img-div {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-top: 10px;
+}
+
+.album-name-div {
+  width: 100%;
+}
+
+.album-name {
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: var(--color-accent);
+  text-align: left;
+  margin-left: 15px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 180px; /* Ensures text doesn't overflow card */
+}
+
+/* Specific style for Artist cards (circular image) */
+.artist-section .album-img {
+  border-radius: 50%;
+}
+
+.artist-section .album-name {
+  text-align: center; /* Center name for artists */
+  margin-left: 0;
+}
+
+/* Artist name (shown on song cards) */
+.artist-name {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  width: 100%;
+  text-align: left;
+  margin-left: 15px;
+  padding-left: 10px;
+  margin-top: -4px;
+}
+
+/* Hamburger menu (likely legacy, not used) */
+.hamburger {
+  display: none;
+}
+
+/* * ============================================================================
+ * Detail Page Styles (Artist / Playlist)
+ * ============================================================================
+ */
+
+/* Wrapper for detail pages (Artist, Playlist, etc.) */
+.page-view {
+  /* padding: 20px; */ /* Original padding, commented out */
+  padding-bottom: 120px; /* So player doesn't hide content */
+}
+
+.page-view h1 {
+  font-size: 2rem;
+  margin-bottom: 10px;
+  text-transform: capitalize;
+}
+
+/* Back button (used in generic detail page) */
+.back-btn {
+  background: var(--color-background-muted);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  margin-bottom: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.2s;
+}
+
+.back-btn:hover {
+  background-color: var(--color-border);
+}
+
+/* Header for Artist/Playlist pages */
+.artist-header {
+  height: 300px;
+  background-size: cover;
+  background-position: center 25%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end; /* Aligns text to the bottom */
+  padding: 24px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+}
+
+.artist-header h1 {
+  font-size: 3rem;
+  font-weight: 800;
+  margin: 0;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7); /* Shadow for readability */
+}
+
+.artist-header span {
+  font-size: 1rem;
+  font-weight: 500;
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7);
+}
+
+/* Song list container */
+.song-list-container {
+  padding: 0 16px;
+}
+
+.song-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Individual song item in the list */
+.song-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.song-item:hover {
+  background-color: var(
+    --color-background-highlight
+  ); /* Note: --color-background-highlight is not defined in base.css, might be a typo for --color-background-muted */
+}
+
+/* Left side of song item (Index, Art, Info) */
+.song-item-left {
+  display: flex;
+  align-items: center;
+  min-width: 0; /* Allows text ellipsis */
+}
+
+/* Song index number (1, 2, 3...) */
+.song-index {
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+  width: 24px;
+  text-align: center;
+  margin-right: 12px;
+}
+
+.song-item-img {
+  width: 45px;
+  height: 45px;
+  border-radius: 4px;
+  margin-right: 12px;
+  object-fit: cover;
+}
+
+.song-item-details {
+  display: flex;
+  flex-direction: column;
+  min-width: 0; /* Ensures text overflow works */
+}
+
+.song-item-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.song-item-artist {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+}
+
+/* Right side of song item (duration) */
+.song-item-right {
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+  padding-left: 10px; /* Ensures space from song info */
+}

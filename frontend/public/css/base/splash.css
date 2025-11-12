@@ -1,0 +1,136 @@
+/*
+ * =========================
+ * VibAura Splash Screen 
+ * =========================
+ *
+ * Styles for the initial loading splash screen.
+ * This version uses simple fade-in animations to avoid a "shrink"
+ * visual artifact that can happen with scale transforms on some browsers.
+ * ========================================================================
+ */
+
+/*
+ * Hides the main app content and scrollbar when the splash screen is active.
+ * This class is added to the <body> by splashScreen.js.
+ */
+body.splash-active {
+  overflow: hidden;
+}
+
+/* * Hides the main app container, player, and mobile nav 
+ * while the splash screen is visible.
+ */
+body.splash-active .container,
+body.splash-active .player-container,
+body.splash-active .mobile-nav {
+  display: none !important;
+}
+
+/* Fullscreen overlay for the splash screen */
+.splash-screen {
+  position: fixed;
+  inset: 0; /* (top: 0, left: 0, right: 0, bottom: 0) */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff;
+  z-index: 10000; /* Ensures it's on top of all other content */
+  pointer-events: none; /* Prevents interaction */
+}
+
+/* * Container for the logo and brand name
+ * Fades in first, before its children.
+ */
+.splash-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  opacity: 0; /* Starts hidden */
+  animation: content-fade-in 0.8s ease-out 0.2s forwards; /* Fades in at 0.2s */
+}
+
+/* Logo container */
+.splash-logo {
+  width: 160px;
+  height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0; /* Starts hidden */
+  animation: logo-fade-in 0.8s ease-out 0.3s forwards; /* Fades in at 0.3s */
+}
+
+.splash-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.15));
+}
+
+/* Brand name text */
+.splash-brand {
+  font-size: 56px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  color: #2d3748;
+  opacity: 0; /* Starts hidden */
+  animation: brand-fade-in 0.8s ease-out 0.5s forwards; /* Fades in at 0.5s */
+  font-family: "Jost", sans-serif;
+}
+
+/* Dark Mode Overrides */
+body.dark-theme .splash-screen {
+  background-color: #1a202c;
+}
+body.dark-theme .splash-brand {
+  color: #f7fafc;
+}
+body.dark-theme .splash-logo img {
+  filter: drop-shadow(0 4px 12px rgba(255, 255, 255, 0.15));
+}
+
+/* * Animation definitions (NO SCALE)
+ * Using simple opacity and transform: none to prevent visual bugs.
+ */
+@keyframes logo-fade-in {
+  0% {
+    opacity: 0;
+    transform: none;
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes brand-fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+@keyframes content-fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .splash-logo {
+    width: 120px;
+    height: 120px;
+  }
+  .splash-brand {
+    font-size: 40px;
+  }
+  .splash-content {
+    gap: 24px;
+  }
+}

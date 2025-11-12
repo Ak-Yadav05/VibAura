@@ -1,16 +1,44 @@
-# Node.js dependencies
+# Node.js
 node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
 
-# Environment variables (for secrets like passwords)
+# Environment variables
 .env
+.env.local
+.env.*.local
 
-# Log files
-*.log
-logs/
-
-# Editor-specific files
+# IDE
 .vscode/
+.idea/
+*.swp
+*.swo
+*~
 
-# OS-specific files
+# OS files
 .DS_Store
 Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Build
+dist/
+build/
+
+# Python (SpotSync) - handles everything under SpotSync folder
+SpotSync/venv/
+SpotSync/.venv/
+SpotSync/__pycache__/
+SpotSync/*.pyc
+SpotSync/downloaded-songs/
+SpotSync/.cache
+SpotSync/.env
+
+# Keep these
+!.env.example
+!SpotSync/.env.example
+!SpotSync/requirements.txt

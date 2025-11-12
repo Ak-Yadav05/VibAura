@@ -1,0 +1,331 @@
+/*
+ * ============================================================================
+ * VibAura Mini-Player - Styling (Desktop)
+ * ============================================================================
+ *
+ * Defines the styles for the mini-player bar fixed at the bottom
+ * of the screen on desktop layouts.
+ *
+ * Features:
+ * - 3-column grid layout (Song Info, Controls, Volume)
+ * - Custom styled progress bar and volume slider
+ * - Hover and active states for all controls
+ * - Dark mode support
+ * ============================================================================
+ */
+
+/* * Container fixed at the bottom of the viewport.
+ * This holds the .player grid.
+ */
+.player-container {
+  height: 90px;
+  flex-shrink: 0; /* Prevents shrinking in the main flex container */
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 99; /* Sits above content, below fullscreen player */
+  background: var(--color-background-surface);
+  border-top: 1px solid var(--color-border);
+}
+
+/* * Main player grid layout (Desktop):
+ * Col 1: Song Info (1fr - flexible)
+ * Col 2: Player Controls (2fr - flexible, larger)
+ * Col 3: Volume Controls (1fr - flexible)
+ */
+.player {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  align-items: center;
+  padding: 0 24px;
+  gap: 24px;
+  background-color: var(--color-background-surface);
+  height: 100%;
+  border-top: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+/* Column 1: Song Info */
+.song-info-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.song-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.song-album-art {
+  width: 56px;
+  height: 56px;
+  border-radius: 8px;
+}
+
+.song-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.song-title {
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.song-artist {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+/* Column 2: Player Controls (Buttons + Progress) */
+.player-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0px; /* Tighter gap between buttons and progress */
+}
+
+.control-buttons {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Base style for all player buttons */
+.player-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%; /* Circular buttons */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition:
+    transform 0.2s ease,
+    filter 0.3s ease;
+}
+
+.player-btn img {
+  width: 25px;
+  height: 25px;
+  filter: brightness(0.2); /* Default dark gray */
+  transition:
+    transform 0.2s ease,
+    filter 0.3s ease;
+}
+
+/* * Desktop-only hover/active effects
+ * (pointer: fine) targets mouse users, (hover: hover) targets devices that can hover.
+ */
+@media (hover: hover) and (pointer: fine) {
+  /* Light Mode Hover + Active (Accent Pink) */
+  .player-btn:hover img {
+    transform: scale(1.1);
+    /* This filter approximates the --color-accent pink */
+    filter: invert(42%) sepia(86%) saturate(750%) hue-rotate(305deg)
+      brightness(100%) contrast(98%);
+  }
+
+  .player-btn:active img {
+    transform: scale(0.9);
+    filter: invert(42%) sepia(86%) saturate(750%) hue-rotate(305deg)
+      brightness(100%) contrast(98%);
+  }
+
+  /* Dark Mode Hover + Active (Accent Blue) */
+  body.dark-theme .player-btn:hover img {
+    transform: scale(1.1);
+    /* This filter approximates the --color-accent blue */
+    filter: invert(70%) sepia(19%) saturate(2100%) hue-rotate(185deg)
+      brightness(105%) contrast(95%);
+  }
+
+  body.dark-theme .player-btn:active img {
+    transform: scale(0.9);
+    filter: invert(70%) sepia(19%) saturate(2100%) hue-rotate(185deg)
+      brightness(105%) contrast(95%);
+  }
+
+  /* * Specific rules for Fullscreen Button (copied from .player-btn)
+   * These are redundant if #open-fullscreen-btn also has .player-btn class,
+   * but harmless.
+   */
+  #open-fullscreen-btn:hover img {
+    transform: scale(1.1);
+    filter: invert(42%) sepia(86%) saturate(750%) hue-rotate(305deg)
+      brightness(100%) contrast(98%);
+  }
+
+  #open-fullscreen-btn:active img {
+    transform: scale(0.9);
+    filter: invert(42%) sepia(86%) saturate(750%) hue-rotate(305deg)
+      brightness(100%) contrast(98%);
+  }
+
+  body.dark-theme #open-fullscreen-btn:hover img {
+    transform: scale(1.1);
+    filter: invert(70%) sepia(19%) saturate(2100%) hue-rotate(185deg)
+      brightness(105%) contrast(95%);
+  }
+
+  body.dark-theme #open-fullscreen-btn:active img {
+    transform: scale(0.9);
+    filter: invert(70%) sepia(19%) saturate(2100%) hue-rotate(185deg)
+      brightness(105%) contrast(95%);
+  }
+
+  /* * Specific rules for Volume Button (copied from .player-btn)
+   * Also redundant if it has the .player-btn class.
+   */
+  #volume-btn:hover img {
+    transform: scale(1.1);
+    filter: invert(42%) sepia(86%) saturate(750%) hue-rotate(305deg)
+      brightness(100%) contrast(98%);
+  }
+
+  #volume-btn:active img {
+    transform: scale(0.9);
+    filter: invert(42%) sepia(86%) saturate(750%) hue-rotate(305deg)
+      brightness(100%) contrast(98%);
+  }
+
+  body.dark-theme #volume-btn:hover img {
+    transform: scale(1.1);
+    filter: invert(70%) sepia(19%) saturate(2100%) hue-rotate(185deg)
+      brightness(105%) contrast(95%);
+  }
+
+  body.dark-theme #volume-btn:active img {
+    transform: scale(0.9);
+    filter: invert(70%) sepia(19%) saturate(2100%) hue-rotate(185deg)
+      brightness(105%) contrast(95%);
+  }
+}
+
+/* Dark Mode Base Filters (White) */
+body.dark-theme .player-btn img,
+body.dark-theme .favorite-btn img,
+body.dark-theme #open-fullscreen-btn img,
+body.dark-theme #volume-btn img {
+  filter: brightness(0) invert(1); /* Makes icons white */
+}
+
+/* Play/Pause button container */
+.play-pause-btn {
+  display: flex;
+}
+
+/* Larger icon for main play/pause button */
+.play-pause-btn img {
+  width: 35px;
+  height: 35px;
+  transition:
+    transform 0.2s ease,
+    filter 0.3s ease;
+}
+
+/* Progress bar container (time + bar + time) */
+.progress-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 80%;
+}
+
+/* Custom progress bar (range input) */
+.progress-bar {
+  -webkit-appearance: none; /* Removes default browser styling */
+  appearance: none;
+  width: 100%;
+  height: 5px;
+  background: var(--color-border);
+  outline: none;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+/* Custom thumb for progress bar (WebKit - Chrome, Safari) */
+.progress-bar::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  background: #d53f8c; /* Accent Pink */
+  border-radius: 50%;
+}
+
+/* Custom thumb for progress bar (Firefox) */
+.progress-bar::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  background: #d53f8c; /* Accent Pink */
+  border-radius: 50%;
+}
+
+/* Dark mode thumb color (Accent Blue) */
+body.dark-theme .progress-bar::-webkit-slider-thumb,
+body.dark-theme .progress-bar::-moz-range-thumb {
+  background: #63b3ed;
+}
+
+/* Time display (0:00) */
+.time-current,
+.time-total {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  min-width: 30px; /* Prevents layout shift as time changes */
+  text-align: center;
+}
+
+/* Column 3: Volume Controls */
+.volume-controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end; /* Aligns to the far right */
+  gap: 8px;
+}
+
+/* Custom volume slider */
+.volume-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100px;
+  height: 4px;
+  background: var(--color-border);
+  outline: none;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+/* Custom thumb for volume (WebKit) */
+.volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  background: #d53f8c; /* Accent Pink */
+  border-radius: 50%;
+}
+
+/* Custom thumb for volume (Firefox) */
+.volume-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  background: #d53f8c; /* Accent Pink */
+  border-radius: 50%;
+}
+
+/* Dark mode accent for volume slider (Accent Blue) */
+body.dark-theme .volume-slider::-webkit-slider-thumb,
+body.dark-theme .volume-slider::-moz-range-thumb {
+  background: #63b3ed;
+}
+
+/* Hide mobile nav on desktop */
+.mobile-nav {
+  display: none;
+}

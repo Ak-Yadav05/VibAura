@@ -1,0 +1,38 @@
+/* * ============================================================================
+ * VibAura Mobile Stylesheet (Main Entry)
+ * ============================================================================
+ *
+ * This file serves as the main CSS entry point for the mobile layout.
+ * It imports base styles and specific component styles needed for mobile,
+ * and then imports all mobile-specific overrides LAST to ensure they
+ * take precedence.
+ *
+ * This file is loaded via media query in index.html for viewports
+ * (max-width: 768px).
+ * ============================================================================
+ */
+
+/* Import base styles */
+@import url("base/base.css");
+
+/* Import ALL base component styles that mobile view depends on */
+@import url("components/header.css");
+@import url("components/player.css");
+@import url("views/content.css");
+@import url("views/fullscreen.css");
+
+/* Import ALL mobile-specific modules LAST to override base styles */
+@import url("responsive/mobile-layout.css");
+@import url("responsive/mobile-header.css");
+@import url("responsive/mobile-player.css");
+@import url("responsive/mobile-nav.css");
+
+/* * Disable fixed overlays (mobile header, mini-player) 
+ * when the fullscreen player is open to prevent interaction conflicts
+ * and stop them from appearing above the fullscreen player.
+ */
+body.fullscreen-open .mobile-header,
+body.fullscreen-open .player-container {
+  pointer-events: none !important;
+  touch-action: none !important;
+}

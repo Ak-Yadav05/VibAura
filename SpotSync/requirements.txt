@@ -1,0 +1,21 @@
+# Spotify API
+spotipy
+
+# YouTube Download
+yt-dlp
+
+# Audio Processing
+mutagen
+pydub
+
+# Database
+pymongo
+
+# Cloud Storage
+cloudinary
+
+# Environment
+python-dotenv
+
+# Progress Bars
+tqdm
