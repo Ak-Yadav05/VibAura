@@ -1,4 +1,4 @@
-# 🎵 VibAura - Modern Music Streaming Platform
+# VibAura - Modern Music Streaming Platform
 
 <div align="center">
 
