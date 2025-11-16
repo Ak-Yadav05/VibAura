@@ -39,7 +39,6 @@
   padding: 0 24px;
   gap: 24px;
   height: 70px;
-  border-bottom: 1px solid var(--color-border);
   background-color: var(--color-background-surface);
   flex-shrink: 0; /* Prevents shrinking when content area is small */
   transition: box-shadow 0.3s ease; /* For scroll shadow */
@@ -110,14 +109,13 @@ body.dark-theme .logo img {
   display: flex;
   align-items: center;
   gap: 12px;
-  background-color: var(--color-background-surface);
+  background-color: var(--color-background-muted);
   border-radius: 999px; /* Pill shape */
   padding: 8px 16px;
   height: 50px;
   width: 100%;
   max-width: 520px; /* Default width */
   margin: 0 auto; /* Centers in the grid cell */
-  border: 1px solid var(--color-border);
   transition:
     background-color 0.2s,
     border-color 0.2s,
@@ -173,8 +171,7 @@ body.dark-theme .logo img {
  * DARK MODE SEARCH BAR
  */
 body.dark-theme .search-bar {
-  background-color: var(--color-background-surface);
-  border: 2px solid var(--color-text-placeholder);
+  background-color: var(--color-background-muted);
 }
 
 body.dark-theme .search-bar input {

@@ -17,9 +17,56 @@
 .content {
   width: 80%; /* Desktop width (20% is for the library sidebar) */
   padding: 30px 5px 0 20px;
-  height: 100%;
-  overflow-y: auto; /* Enables vertical scrolling for the page content */
+  height: 88%;
+  overflow-y: scroll; /* Enable vertical scrolling */
   position: relative;
+  /* margin: 0px 0px 0px 0px; */
+  border-radius: 20px 0px 0px 20px;
+  background-color: var(--color-background-muted);
+  scrollbar-width: none; /* Firefox - hide native scrollbar */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+/* Chrome, Safari, Opera - hide native scrollbar */
+.content::-webkit-scrollbar {
+  display: none;
+}
+
+/* Custom scrollbar styles */
+.custom-scrollbar {
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: 12px;
+  height: 80%;
+  background: transparent;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+  z-index: 5;
+  box-sizing: border-box;
+}
+
+.content:hover ~ .custom-scrollbar,
+.custom-scrollbar:hover {
+  opacity: 1;
+  pointer-events: auto;
+  transition: opacity 0.1s ease;
+}
+
+.custom-scrollbar-thumb {
+  position: absolute;
+  width: 10px;
+  background: var(--color-scrollbar);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  min-height: 20px;
+}
+
+.custom-scrollbar-thumb:hover,
+.custom-scrollbar-thumb.dragging {
+  background: var(--color-accent);
 }
 
 /* * Wrapper for a single horizontal card section (e.g., "Trending Albums")
@@ -71,10 +118,7 @@
   align-items: center;
   justify-content: flex-start;
   cursor: pointer;
-  transition:
-    background 0.2s,
-    transform 0.3s ease,
-    box-shadow 0.3s ease;
+  transition: background 0.2s, transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 /* * Apply hover effects only on devices that can hover (not touch)
@@ -129,9 +173,9 @@
 /* * Container for all content sections (e.g., "Trending", "New Releases")
  * This element is injected into by pageRenderer.js
  */
-#album-sections {
-  margin-bottom: 90px; /* Padding to avoid player overlap at the bottom */
-}
+/* #album-sections {
+  margin-bottom: 90px;
+} */
 
 .album-img {
   width: 180px;

@@ -17,8 +17,7 @@
 
 .library {
   width: 20%; /* Takes 20% of the main content width on desktop */
-  background-color: var(--color-background-sidebar);
-  border-right: 1px solid var(--color-border);
+  background-color: var(--color-background-surface);
   display: flex;
   flex-direction: column;
   gap: 16px;
