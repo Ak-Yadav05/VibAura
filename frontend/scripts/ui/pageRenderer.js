@@ -349,28 +349,37 @@ export function renderSearchPage() {
     return;
   }
 
+  // Get user avatar from somewhere (placeholder for now)
+  const userAvatar =
+    "https://placehold.co/40x40/DBEAFE/2563EB?text=A";
+
   // Set the HTML structure for the search page
   contentArea.innerHTML = `
     <div class="page-view search-page">
       <div class="search-page-container">
         <div class="search-page-input-wrapper">
-          <img src="images/icons/search.png" alt="Search" class="search-icon" />
-          <input 
-            type="text" 
-            id="vibAura-search-input" 
-            class="vibAura-search-input"
-            placeholder="What do you want to play?" 
-            autocomplete="off"
-            aria-label="Search songs, artists, and playlists"
-          />
-          <button 
-            class="search-clear-btn" 
-            id="search-clear-btn"
-            aria-label="Clear search"
-            style="display: none;"
-          >
-            ✕
-          </button>
+          <img src="images/music.png" alt="VibAura Logo" class="search-logo" />
+          <div class="search-bar-container">
+            <img src="images/icons/search.png" alt="Search" class="search-icon" />
+            <input 
+              type="text" 
+              id="vibAura-search-input" 
+              class="vibAura-search-input"
+              placeholder="What do you want to play?" 
+              autocomplete="off"
+              aria-label="Search songs, artists, and playlists"
+              readonly
+            />
+            <button 
+              class="search-clear-btn" 
+              id="search-clear-btn"
+              aria-label="Clear search"
+              style="display: none;"
+            >
+              ✕
+            </button>
+          </div>
+          <img src="${userAvatar}" alt="User Avatar" class="search-avatar" />
         </div>
         
         <div class="search-results-dropdown" id="search-results" style="position: relative; top: 0; left: 0; right: 0; border: none; max-height: none;">
@@ -385,7 +394,11 @@ export function renderSearchPage() {
         </div>
       </div>
     </div>`;
+
+  // Mark the page as active
+  document.body.classList.add("search-page-active");
 }
+
 
 /**
  * Renders a generic detail page template (e.g., for un-implemented routes).

@@ -23,29 +23,82 @@
   flex-direction: column;
   height: 100%;
   overflow: hidden;
+  padding: 0;
+  margin: 0;
+}
+
+/* Hide mobile header when on search page */
+body.search-page-active .mobile-header {
+  display: none !important;
+}
+
+/* Remove padding from search page */
+.search-page {
+  padding: 0 !important;
 }
 
 /**
  * SEARCH INPUT WRAPPER
  * The search bar container at the top of the search page.
+ * Centered with logo on left, avatar on right.
  */
 .search-page-input-wrapper {
-  flex-shrink: 0; /* Prevents shrinking when content grows */
-  padding: 16px 15px;
+  flex-shrink: 0;
+  padding: 12px 15px;
   background-color: var(--color-background-surface);
   border-bottom: 1px solid var(--color-border);
   display: flex;
   align-items: center;
-  gap: 8px;
-  height: 50px;
-  border-radius: 15px;
+  gap: 12px;
+  height: 70px;
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 50;
+}
+
+/* Search bar logo (left side) */
+.search-page-input-wrapper .search-logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  cursor: pointer;
+  filter: brightness(0);
+}
+
+body.dark-theme .search-page-input-wrapper .search-logo {
+  filter: brightness(0) invert(1);
+}
+
+/* Search bar container (center) */
+.search-page-input-wrapper .search-bar-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background-color: var(--color-background-muted);
+  border-radius: 999px;
+  padding: 10px 16px;
+  height: 48px;
+  transition: all 0.3s ease;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.search-page-input-wrapper.search-active .search-bar-container {
+  max-width: 100%;
+  border-radius: 12px;
+  margin: 0;
 }
 
 .search-page-input-wrapper .search-icon {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   flex-shrink: 0;
   filter: brightness(0.6);
+  transition: filter 0.2s ease;
 }
 
 body.dark-theme .search-page-input-wrapper .search-icon {
@@ -54,13 +107,13 @@ body.dark-theme .search-page-input-wrapper .search-icon {
 
 .search-page-input-wrapper .vibAura-search-input {
   font-size: 0.95rem;
-  flex: 1; /* Takes up remaining space */
+  flex: 1;
   border: none;
   background: none;
   outline: none;
   color: var(--color-text-primary);
   padding: 0;
-  min-width: 0; /* Allows shrinking in flex context */
+  min-width: 0;
 }
 
 .search-page-input-wrapper .vibAura-search-input::placeholder {
@@ -90,6 +143,17 @@ body.dark-theme .search-page-input-wrapper .search-icon {
   color: var(--color-accent);
 }
 
+/* Avatar on right side */
+.search-page-input-wrapper .search-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  cursor: pointer;
+  border: 2px solid var(--color-accent);
+}
+
 /**
  * SEARCH RESULTS ON PAGE
  * This is the container for results, which is part of the page flow
@@ -102,8 +166,14 @@ body.dark-theme .search-page-input-wrapper .search-icon {
   margin: 0;
   border: none;
   z-index: auto; /* Stays within page flow */
-  display: flex;
+  display: none; /* Hidden by default */
   flex-direction: column;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.search-page.search-active .search-results-dropdown {
+  display: flex;
 }
 
 .search-page .search-results-content {
@@ -111,6 +181,8 @@ body.dark-theme .search-page-input-wrapper .search-icon {
   flex-direction: column;
   gap: 0;
   padding: 0;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /**
@@ -244,15 +316,20 @@ body.dark-theme .search-page-input-wrapper .search-icon {
   /* Add padding to bottom to avoid being hidden by mobile nav/player */
   .search-page {
     padding-bottom: var(--mobile-nav-height, 55px);
+    padding-top: 0;
   }
 
   .search-page .search-results-dropdown {
-    margin-left: 8px;
-    border-radius: 5px;
+    margin-left: 0;
+    border-radius: 0;
   }
 
-  /* Ensure container respects header (60px) and nav (50px) heights */
+  /* Ensure container respects search bar (70px) and nav (55px) heights */
   .search-page-container {
-    max-height: calc(100vh - 60px - 50px);
+    max-height: calc(100vh - 70px - 55px);
+  }
+
+  .search-page-input-wrapper {
+    height: 65px;
   }
 }

@@ -170,6 +170,9 @@ function setupMobileSearchNavigation() {
       setTimeout(() => {
         attachSearchListenersToPage();
       }, 100);
+    } else {
+      // When leaving search page, remove the active class
+      document.body.classList.remove("search-page-active");
     }
   };
 
@@ -187,10 +190,16 @@ function setupMobileSearchNavigation() {
 /**
  * ATTACH SEARCH LISTENERS TO PAGE (Mobile)
  * Attaches listeners to the search input on the dedicated #search page.
+ * Implements lazy activation: input is readonly until clicked.
  */
 function attachSearchListenersToPage() {
   const searchInput = document.getElementById("vibAura-search-input");
   const clearBtn = document.getElementById("search-clear-btn");
+  const searchBarContainer = document.querySelector(".search-bar-container");
+  const searchPageInputWrapper = document.querySelector(
+    ".search-page-input-wrapper"
+  );
+  const searchPage = document.querySelector(".search-page");
 
   if (!searchInput) {
     console.warn("[Search] Search input element not found on page");
@@ -198,6 +207,23 @@ function attachSearchListenersToPage() {
   }
 
   console.log("[Search] Attaching listeners to search page input...");
+
+  // Make input readonly initially
+  searchInput.setAttribute("readonly", "");
+
+  // Click handler - activate search mode
+  searchInput.addEventListener("click", () => {
+    if (searchInput.hasAttribute("readonly")) {
+      console.log("[Search] Activating search mode...");
+      // Remove readonly to enable typing
+      searchInput.removeAttribute("readonly");
+      // Mark as active
+      searchPageInputWrapper.classList.add("search-active");
+      searchPage.classList.add("search-active");
+      // Focus and open keyboard
+      searchInput.focus();
+    }
+  });
 
   // INPUT EVENT - Debounced search
   searchInput.addEventListener("input", (e) => {
@@ -230,8 +256,19 @@ function attachSearchListenersToPage() {
     });
   }
 
-  // Auto-focus the input when the search page loads
-  searchInput.focus();
+  // ESCAPE KEY - Close search and return to readonly mode
+  searchInput.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      console.log("[Search] Closing search mode...");
+      searchInput.setAttribute("readonly", "");
+      searchInput.value = "";
+      if (clearBtn) clearBtn.style.display = "none";
+      closeSearchResults();
+      searchPageInputWrapper.classList.remove("search-active");
+      searchPage.classList.remove("search-active");
+      searchInput.blur();
+    }
+  });
 }
 
 /**

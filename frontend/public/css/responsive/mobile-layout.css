@@ -19,6 +19,11 @@
   --mobile-header-height: 60px;
 }
 
+/* Hides the new desktop-only scrollbar on mobile */
+.custom-scrollbar {
+  display: none !important;
+}
+
 /* Hide Desktop-only Elements */
 #open-fullscreen-btn, /* Fullscreen button in desktop player */
 .nav, /* Desktop header */
@@ -51,6 +56,15 @@
     0px; /* * Top padding for fixed header (60px)
          * Bottom padding for mini-player (60px) + bottom nav (50px) + extra space (30px)
          */
+  height: 100%;
+  border-radius: 0px;
+  overflow-y: auto;
+}
+
+/* Remove padding for search page */
+.search-page .content,
+body.search-page-active .content {
+  padding: 0 !important;
 }
 
 h2 {
