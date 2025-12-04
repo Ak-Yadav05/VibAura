@@ -1,18 +1,15 @@
 /**
  * ============================================================================
- * VibAura Base Stylesheet - Global Theme & Layout
+ * VibAura Base Stylesheet - Global Resets & Typography
  * ============================================================================
  *
- * Defines:
- * - Color theme variables for light/dark modes (CSS Custom Properties)
- * - Global element resets and normalization (e.g., box-sizing)
- * - Main application layout structure (container, main content area)
- * - Background gradients and typography baseline
+ * This file contains ONLY:
+ * - Global element resets and normalization (box-sizing, margins, etc.)
+ * - Typography baseline (font-family, line-height)
+ * - HTML/body resets for flex layout foundation
  *
- * Design System:
- * - Uses CSS custom properties (variables) for theming
- * - Light mode (default): Warm pink/white color scheme
- * - Dark mode (.dark-theme): Deep blue/gray color scheme
+ * DESIGN SYSTEM VARIABLES: See css/base/variables.css
+ * LAYOUT STRUCTURE: See css/desktop/*.css and css/mobile/*.css
  * ============================================================================
  */
 
@@ -45,6 +42,9 @@
 
   /* Scrollbar color */
   --color-scrollbar: #d9d9d9;
+
+  /* Breakpoint - SYNC-POINT #1 of 7 */
+  --breakpoint: 768px;
 }
 
 /**

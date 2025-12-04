@@ -1,0 +1,283 @@
+/**
+ * ============================================================================
+ * VibAura Desktop Mini-Player
+ * ============================================================================
+ *
+ * Fixed mini-player at bottom of desktop view.
+ * Grid layout (3 columns): Song Info | Controls | Volume
+ * 90px height
+ * NO media queries (desktop-only file)
+ * ============================================================================
+ */
+
+/**
+ * PLAYER CONTAINER
+ * Fixed at bottom, z-index 99
+ */
+.player-container {
+  height: 90px;
+  flex-shrink: 0;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 99;
+  background: var(--color-background-surface);
+}
+
+/**
+ * PLAYER GRID LAYOUT (Desktop)
+ * 3 columns: Song Info (1fr) | Controls (2fr) | Volume (1fr)
+ */
+.player {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  align-items: center;
+  padding: 0 24px;
+  gap: 24px;
+  background-color: var(--color-background-surface);
+  height: 100%;
+  flex-shrink: 0;
+}
+
+/**
+ * COLUMN 1: SONG INFO
+ */
+.song-info-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.song-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.song-album-art {
+  width: 56px;
+  height: 56px;
+  border-radius: 8px;
+}
+
+.song-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.song-title {
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.song-artist {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+/**
+ * FAVORITE BUTTON (in song info)
+ */
+.favorite-btn {
+  width: 40px;
+  height: 40px;
+}
+
+/**
+ * COLUMN 2: PLAYER CONTROLS
+ */
+.player-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0px;
+}
+
+.control-buttons {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/**
+ * BASE PLAYER BUTTON STYLE
+ */
+.player-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+.player-btn img {
+  width: 24px;
+  height: 24px;
+  filter: brightness(0.4);
+  transition: filter 0.3s ease, transform 0.2s ease;
+}
+
+.player-btn:hover img {
+  transform: scale(1.1);
+  filter: brightness(1) drop-shadow(0 0 6px var(--color-accent));
+}
+
+body.dark-theme .player-btn img {
+  filter: brightness(0) invert(1);
+}
+
+body.dark-theme .player-btn:hover img {
+  filter: brightness(1) drop-shadow(0 0 6px var(--color-accent));
+}
+
+/**
+ * PLAY/PAUSE BUTTON - LARGER
+ */
+.play-pause-btn {
+  width: 48px;
+  height: 48px;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 50%;
+  padding: 0;
+}
+
+.play-pause-btn img {
+  width: 28px;
+  height: 28px;
+}
+
+body.dark-theme .play-pause-btn {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/**
+ * PROGRESS BAR SECTION
+ */
+.progress-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin-top: 8px;
+}
+
+.time-current,
+.time-total {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  min-width: 35px;
+  text-align: center;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--color-border);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+
+/* Progress bar thumb (draggable handle) */
+.progress-bar::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  background: var(--color-accent);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.progress-bar::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 8px var(--color-accent);
+}
+
+.progress-bar::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  background: var(--color-accent);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.progress-bar::-moz-range-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 8px var(--color-accent);
+}
+
+/**
+ * COLUMN 3: VOLUME CONTROLS
+ */
+.volume-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.volume-slider {
+  width: 120px;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--color-border);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+
+.volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  background: var(--color-accent);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.volume-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 8px var(--color-accent);
+}
+
+.volume-slider::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  background: var(--color-accent);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.volume-slider::-moz-range-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 8px var(--color-accent);
+}
+
+/**
+ * FULLSCREEN BUTTON (in volume section)
+ */
+#open-fullscreen-btn {
+  display: flex; /* Visible on desktop */
+}
+
+/**
+ * BUTTON ACTIVE/REPEAT STATES
+ */
+.player-btn.active img,
+.player-btn.repeat-one img {
+  filter: brightness(1) drop-shadow(0 0 6px var(--color-accent));
+}

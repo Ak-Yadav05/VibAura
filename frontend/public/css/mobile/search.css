@@ -1,0 +1,142 @@
+/**
+ * ============================================================================
+ * VibAura Mobile Search Component
+ * ============================================================================
+ *
+ * Mobile-specific search UI (full-screen overlay).
+ * Search results displayed as full-screen page on mobile.
+ * NO media queries (mobile-only file)
+ * ============================================================================
+ */
+
+.search-page {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--color-background-surface);
+  z-index: 95;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+body.search-page-active .search-page {
+  display: flex;
+}
+
+/**
+ * SEARCH PAGE HEADER
+ */
+.search-page-header {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  gap: 8px;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.search-page-back {
+  background: none;
+  border: none;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.search-page-back img {
+  width: 24px;
+  height: 24px;
+}
+
+.search-page-input {
+  flex: 1;
+  border: none;
+  background: var(--color-background-muted);
+  border-radius: 20px;
+  padding: 8px 12px;
+  font-size: 0.95rem;
+  outline: none;
+  color: var(--color-text-primary);
+}
+
+.search-page-input::placeholder {
+  color: var(--color-text-placeholder);
+}
+
+/**
+ * SEARCH RESULTS
+ */
+.search-page-results {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.search-result-item {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--color-border);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.search-result-item:active {
+  background-color: var(--color-background-muted);
+}
+
+.search-result-img {
+  width: 45px;
+  height: 45px;
+  border-radius: 4px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.search-result-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.search-result-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.search-result-subtitle {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/**
+ * EMPTY STATE
+ */
+.search-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--color-text-secondary);
+  text-align: center;
+  padding: 20px;
+}

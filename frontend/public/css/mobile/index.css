@@ -1,0 +1,46 @@
+/**
+ * ============================================================================
+ * VibAura Mobile Stylesheet - Entry Point
+ * ============================================================================
+ *
+ * This file imports all base and mobile-specific component styles.
+ * It is loaded via media query in index.html for viewports (max-width: 768px).
+ *
+ * Mobile-specific component styling (no media queries within components).
+ * All breakpoint logic handled at HTML link level.
+ * ============================================================================
+ */
+
+/* Import shared variables and resets */
+@import url("../base/variables.css");
+@import url("../base/base.css");
+
+/* Import skeleton/loading animations */
+@import url("../base/skeleton.css");
+
+/* Import mobile-specific component styles */
+@import url("./header.css");
+@import url("./content.css");
+@import url("./player.css");
+@import url("./navigation.css");
+@import url("./fullscreen.css");
+@import url("./search.css");
+
+/**
+ * HIDE DESKTOP-ONLY ELEMENTS ON MOBILE
+ */
+.nav,
+.library,
+.custom-scrollbar,
+#open-fullscreen-btn,
+.scroll-btn {
+  display: none !important;
+}
+
+/**
+ * Disable fixed overlays when fullscreen player is open
+ */
+body.fullscreen-open .player-container {
+  pointer-events: none !important;
+  touch-action: none !important;
+}

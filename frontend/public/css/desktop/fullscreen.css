@@ -1,0 +1,189 @@
+/**
+ * ============================================================================
+ * VibAura Desktop Fullscreen Player
+ * ============================================================================
+ *
+ * Full-screen overlay player with large album art and controls.
+ * z-index: 200 (above mini-player and content)
+ * NO media queries (desktop-only file)
+ * ============================================================================
+ */
+
+.fullscreen-player {
+  position: fixed;
+  inset: 0;
+  background-color: var(--color-background-surface);
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  z-index: var(--z-fullscreen-player);
+}
+
+body.fullscreen-open .fullscreen-player {
+  display: flex;
+}
+
+/**
+ * FULLSCREEN HEADER (Close button)
+ */
+.fullscreen-player-header {
+  display: flex;
+  justify-content: flex-start;
+  padding: 24px;
+}
+
+.close-fullscreen-btn {
+  background: none;
+  border: none;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-fullscreen-btn img {
+  width: 28px;
+  height: 28px;
+  filter: brightness(0.4);
+  transition: filter 0.2s ease, transform 0.2s ease;
+}
+
+.close-fullscreen-btn:hover img {
+  filter: brightness(1);
+  transform: scale(1.1);
+}
+
+/**
+ * FULLSCREEN BODY (Main content area)
+ */
+.fullscreen-player-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  gap: 40px;
+  flex: 1;
+}
+
+/**
+ * ALBUM ART DISC
+ * Large rotating album art with disc effect
+ */
+.album-art-disc {
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-background-muted);
+}
+
+.album-art-disc img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/**
+ * SONG INFO (Title & Artist)
+ */
+.fs-info-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  text-align: center;
+}
+
+.song-details-large {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.song-details-large .song-title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--color-text-primary);
+}
+
+.song-details-large .song-artist {
+  font-size: 1.2rem;
+  color: var(--color-text-secondary);
+}
+
+/**
+ * PROGRESS BAR (Fullscreen version)
+ */
+.progress-container-large {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  max-width: 600px;
+}
+
+.progress-bar-wrapper {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+#fullscreen-progress-bar {
+  width: 100%;
+  height: 6px;
+  cursor: pointer;
+}
+
+.time-display-wrapper {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+}
+
+/**
+ * CONTROL BUTTONS (Fullscreen version)
+ */
+.control-buttons-large {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  width: 100%;
+}
+
+.center-controls {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.control-buttons-large .player-btn {
+  width: 56px;
+  height: 56px;
+}
+
+.control-buttons-large .play-pause-btn {
+  width: 72px;
+  height: 72px;
+  background: var(--color-accent);
+  border-radius: 50%;
+}
+
+.control-buttons-large .play-pause-btn img {
+  width: 36px;
+  height: 36px;
+  filter: brightness(1) invert(1);
+}
+
+.control-buttons-large .player-btn img {
+  width: 32px;
+  height: 32px;
+}

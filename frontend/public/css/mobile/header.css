@@ -1,0 +1,111 @@
+/**
+ * ============================================================================
+ * VibAura Mobile Header (MOBILE ONLY)
+ * ============================================================================
+ *
+ * Fixed header at top of mobile view (65px).
+ * Flex layout: logo | theme toggle + profile
+ * Uses original .mobile-header class name.
+ * NO media queries (mobile-only file)
+ * ============================================================================
+ */
+
+/**
+ * MOBILE HEADER (flex-based)
+ */
+.mobile-header {
+  display: flex !important;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: 65px;
+  background-color: var(--color-background-surface);
+  padding: 0 16px;
+  flex-shrink: 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 90;
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+}
+
+.nav-left .logo {
+  display: flex;
+  align-items: center;
+}
+
+.logo img {
+  width: 40px;
+  height: 40px;
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/**
+ * THEME TOGGLE (Mobile)
+ */
+#mobile-theme-toggle {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+#mobile-theme-toggle img {
+  width: 24px;
+  height: 24px;
+  transition: transform 0.4s ease, opacity 0.4s ease;
+}
+
+.sun-icon {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.moon-icon {
+  transform: translateY(20px);
+  opacity: 0;
+}
+
+body.dark-theme .sun-icon {
+  transform: translateY(-20px);
+  opacity: 0;
+}
+
+body.dark-theme .moon-icon {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/**
+ * USER PROFILE (Mobile)
+ */
+.user-profile {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.user-profile img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}
+
+.user-profile span {
+  display: none; /* Hide name on mobile */
+}
