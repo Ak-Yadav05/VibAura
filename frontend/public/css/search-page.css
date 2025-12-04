@@ -59,17 +59,12 @@ body.search-page-active .mobile-header {
 
 /* Search bar logo (left side) */
 .search-page-input-wrapper .search-logo {
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   object-fit: cover;
   flex-shrink: 0;
   cursor: pointer;
-  filter: brightness(0);
-}
-
-body.dark-theme .search-page-input-wrapper .search-logo {
-  filter: brightness(0) invert(1);
 }
 
 /* Search bar container (center) */

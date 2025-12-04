@@ -61,23 +61,18 @@ body.dark-theme .nav.scrolled {
  * BRAND SECTION (Left side)
  * Logo image and application name
  */
-.nav-left {
+.nav-left .logo {
   display: flex;
   align-items: center;
-  gap: 8px;
 }
 
 /**
  * BRAND LOGO
- * Small icon next to brand name
+ * Logo icon
  */
 .logo img {
-  width: 30px;
-  height: 30px;
-}
-
-body.dark-theme .logo img {
-  filter: brightness(0) invert(1); /* White in dark mode */
+  width: 50px;
+  height: 50px;
 }
 
 /**
