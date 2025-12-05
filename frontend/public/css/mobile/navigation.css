@@ -16,8 +16,8 @@
   right: 0;
   bottom: 0;
   height: var(--mobile-nav-height);
-  background-color: var(--color-background-surface);
-  border-top: 1px solid var(--color-border);
+  background-color: var(--color-background-mbtd);
+  /* border-top: 1px solid var(--color-border); */
   z-index: var(--z-mobile-nav);
 }
 

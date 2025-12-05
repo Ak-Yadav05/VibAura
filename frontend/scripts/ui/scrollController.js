@@ -53,13 +53,14 @@ function updateCustomScrollbarPosition(content, thumb, scrollbarContainer) {
  */
 export function initScrollController() {
   const navHeader = document.querySelector(".nav");
+  const mobileHeader = document.querySelector(".mobile-header");
   const contentArea = document.querySelector(".content");
   const customScrollbar = document.querySelector(".custom-scrollbar");
   const scrollbarThumb = document.querySelector(".custom-scrollbar-thumb");
 
-  if (!navHeader || !contentArea) {
+  if (!contentArea) {
     console.warn(
-      "VibAura: Header (.nav) or Content area (.content) not found for scroll controller."
+      "VibAura: Content area (.content) not found for scroll controller."
     );
     return;
   }
@@ -69,9 +70,11 @@ export function initScrollController() {
   // Handle scroll events for header shadow and scrollbar position
   const handleScroll = () => {
     if (contentArea.scrollTop > 1) {
-      navHeader.classList.add("scrolled");
+      if (navHeader) navHeader.classList.add("scrolled");
+      if (mobileHeader) mobileHeader.classList.add("scrolled");
     } else {
-      navHeader.classList.remove("scrolled");
+      if (navHeader) navHeader.classList.remove("scrolled");
+      if (mobileHeader) mobileHeader.classList.remove("scrolled");
     }
 
     if (hasCustomScrollbar) {
@@ -143,7 +146,8 @@ export function initScrollController() {
 
   // Apply initial header state
   if (contentArea.scrollTop > 1) {
-    navHeader.classList.add("scrolled");
+    if (navHeader) navHeader.classList.add("scrolled");
+    if (mobileHeader) mobileHeader.classList.add("scrolled");
   }
 }
 

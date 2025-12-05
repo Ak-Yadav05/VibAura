@@ -83,19 +83,28 @@ export async function router() {
   // Show/hide header based on route for mobile responsiveness
   // Library page hides header; all other pages show it
   if (mobileHeader && contentArea) {
+    console.log(`[Router] Mobile check - innerWidth: ${window.innerWidth}, hash: ${hash}`);
     if (window.innerWidth <= 768) {
       // Mobile view
       if (hash === "#library") {
+        console.log("[Router] Hiding mobile header for library page");
         mobileHeader.style.display = "none";
+        mobileHeader.style.visibility = "hidden";
         contentArea.style.paddingTop = "20px";
+        document.body.classList.add("library-page-active");
       } else {
+        console.log("[Router] Showing mobile header");
         mobileHeader.style.display = "flex";
+        mobileHeader.style.visibility = "visible";
         contentArea.style.paddingTop = "75px";
+        document.body.classList.remove("library-page-active");
       }
     } else {
       // Reset to default styles for desktop view
       mobileHeader.style.display = ""; // Resets to CSS default
+      mobileHeader.style.visibility = "";
       contentArea.style.paddingTop = ""; // Resets to CSS default
+      document.body.classList.remove("library-page-active");
     }
   }
 

@@ -15,8 +15,8 @@
   width: 100% !important;
   padding-top: 80px !important;
   padding-bottom: calc(60px + 50px + 30px) !important;
-  padding-left: 10px !important;
-  padding-right: 10px !important;
+  /* padding-left: 10px !important; */
+  /* padding-right: 10px !important; */
   height: 100%;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
@@ -126,7 +126,7 @@
   flex-direction: column;
   align-items: flex-start;
   justify-content: flex-start;
-  padding: 0 5px;
+  padding-left: 15px;
   cursor: pointer;
   transition: background 0.2s, transform 0.2s ease;
   box-sizing: border-box;
@@ -185,9 +185,9 @@
   width: 100%;
 }
 
-#album-sections h2{
-    font-size: 20px;
-    padding-left: 5px;
+#album-sections h2 {
+  font-size: 20px;
+  padding-left: 15px;
 }
 
 .artist-section .album-name {
@@ -196,12 +196,10 @@
 }
 
 .artist-name {
-  font-size: 0.7rem;
+  font-size: 0.6rem;
   color: var(--color-text-muted);
   width: 100%;
   text-align: left;
-  margin-left: 0;
-  margin-top: 2px;
   padding: 0;
   white-space: nowrap;
   overflow: hidden;

@@ -25,6 +25,7 @@
 @import url("./navigation.css");
 @import url("./fullscreen.css");
 @import url("./search.css");
+@import url("./library.css");
 
 /**
  * HIDE DESKTOP-ONLY ELEMENTS ON MOBILE
