@@ -45,7 +45,7 @@ body.search-page-active .mobile-header {
 .search-page-input-wrapper {
   flex-shrink: 0;
   padding: 12px 15px;
-  background-color: var(--color-background-surface);
+  background-color: var(--color-background-mbtd);
   border-bottom: 1px solid var(--color-border);
   display: flex;
   align-items: center;
@@ -61,10 +61,6 @@ body.search-page-active .mobile-header {
 .search-page-input-wrapper .search-logo {
   width: 50px;
   height: 50px;
-  border-radius: 50%;
-  object-fit: cover;
-  flex-shrink: 0;
-  cursor: pointer;
 }
 
 /* Search bar container (center) */
@@ -73,7 +69,7 @@ body.search-page-active .mobile-header {
   display: flex;
   align-items: center;
   gap: 12px;
-  background-color: var(--color-background-muted);
+  background-color: var(--color-background-surface);
   border-radius: 999px;
   padding: 10px 16px;
   height: 48px;
@@ -101,7 +97,7 @@ body.dark-theme .search-page-input-wrapper .search-icon {
 }
 
 .search-page-input-wrapper .vibAura-search-input {
-  font-size: 0.95rem;
+  font-size: 0.8rem;
   flex: 1;
   border: none;
   background: none;
@@ -146,7 +142,7 @@ body.dark-theme .search-page-input-wrapper .search-icon {
   object-fit: cover;
   flex-shrink: 0;
   cursor: pointer;
-  border: 2px solid var(--color-accent);
+  /* border: 2px solid var(--color-accent); */
 }
 
 /**

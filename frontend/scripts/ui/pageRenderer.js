@@ -35,15 +35,20 @@ import {
 // Helper function to get the main content area element
 const getContentArea = () => document.getElementById("album-sections");
 
+// Cache for homepage data to prevent redundant invalidation/loading states
+let cachedHomepageData = null;
+
 /**
  * Renders the home page with trending content and album sections.
  *
  * Flow:
- * 1. Display multiple skeleton placeholder sections immediately.
- * 2. Fetch content from /api/homepage.
- * 3. On success, clear skeletons and render real content sections.
- * 4. Attach scroll listeners to the new horizontal card sections.
- * 5. On failure, display an error message.
+ * 1. Check cache: if data exists, render immediately and skip skeletons.
+ * 2. If no cache: Display multiple skeleton placeholder sections immediately.
+ * 3. Fetch content from /api/homepage.
+ * 4. On success, clear skeletons and render real content sections.
+ * 5. Cache the data.
+ * 6. Attach scroll listeners to the new horizontal card sections.
+ * 7. On failure, display an error message.
  *
  * @async
  * @exports renderHomePage
@@ -54,6 +59,20 @@ export async function renderHomePage() {
   if (!contentArea) {
     console.error("[PageRenderer] ERROR: album-sections element not found!");
     return;
+  }
+
+  // OPTIMIZATION: Check if we have cached data to render immediately
+  if (cachedHomepageData) {
+    contentArea.innerHTML = ""; // Clear previous content
+    cachedHomepageData.forEach((section) => {
+      const items = section.songs || section.items;
+      if (items && items.length > 0) {
+        if (!section.songs) section.songs = items;
+        contentArea.appendChild(createSectionElement(section));
+      }
+    });
+    attachScrollButtonListeners();
+    return; // Exit early, no need to fetch or show skeletons
   }
 
   contentArea.innerHTML = ""; // Clear previous content
@@ -75,6 +94,9 @@ export async function renderHomePage() {
     if (!response.ok) throw new Error("Failed to fetch homepage data");
 
     const homepageSections = await response.json();
+
+    // Store in cache for next time
+    cachedHomepageData = homepageSections;
 
     // Step 3: Replace skeletons with real content
     contentArea.innerHTML = ""; // Clear skeletons
@@ -139,9 +161,8 @@ export async function renderArtistPage(artistId) {
         <li class="song-item" data-index="${index}">
           <div class="song-item-left">
             <span class="song-index">${index + 1}</span>
-            <img src="${song.artworkUrl}" alt="${
-        song.title
-      }" class="song-item-img">
+            <img src="${song.artworkUrl}" alt="${song.title
+        }" class="song-item-img">
             <div class="song-item-details">
               <span class="song-item-title">${song.title}</span>
               <span class="song-item-artist">${artist.name}</span>
@@ -161,9 +182,8 @@ export async function renderArtistPage(artistId) {
       <div class="page-view artist-page">
         <div class="artist-header" style="${headerStyle}">
           <h1>${artist.name}</h1>
-          <span>${songs.length} ${
-      songs.length === 1 ? "song" : "songs"
-    }</span>
+          <span>${songs.length} ${songs.length === 1 ? "song" : "songs"
+      }</span>
         </div>
         <div class="song-list-container">
           <ul class="song-list">${songsListHTML}</ul>
@@ -222,9 +242,8 @@ export async function renderPlaylistPage(playlistId) {
         <li class="song-item" data-index="${index}">
           <div class="song-item-left">
             <span class="song-index">${index + 1}</span>
-            <img src="${song.artworkUrl}" alt="${
-        song.title
-      }" class="song-item-img">
+            <img src="${song.artworkUrl}" alt="${song.title
+        }" class="song-item-img">
             <div class="song-item-details">
               <span class="song-item-title">${song.title}</span>
               <span class="song-item-artist">${artistName}</span>
@@ -246,9 +265,8 @@ export async function renderPlaylistPage(playlistId) {
       <div class="page-view playlist-page">
         <div class="artist-header" style="${headerStyle}">
           <h1>${playlist.name}</h1>
-          <span>${songs.length} ${
-      songs.length === 1 ? "song" : "songs"
-    }</span>
+          <span>${songs.length} ${songs.length === 1 ? "song" : "songs"
+      }</span>
         </div>
         <div class="song-list-container">
           <ul class="song-list">${songsListHTML}</ul>

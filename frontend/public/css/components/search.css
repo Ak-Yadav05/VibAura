@@ -27,12 +27,14 @@
   width: 100%;
   max-width: 520px;
   margin: 0 auto;
-  flex: 1; /* Allows it to grow in the header */
+  flex: 1;
+  /* Allows it to grow in the header */
   display: flex;
   align-items: center;
   gap: 12px;
   background-color: var(--color-background-muted);
-  border-radius: 999px; /* Pill shape */
+  border-radius: 999px;
+  /* Pill shape */
   padding: 8px 16px;
   height: 50px;
   transition: all 0.2s ease;
@@ -135,7 +137,8 @@ body.dark-theme .search-icon {
  */
 .search-results-dropdown {
   position: absolute;
-  top: calc(100% + 8px); /* 8px below the search bar */
+  top: calc(100% + 8px);
+  /* 8px below the search bar */
   left: 0;
   right: 0;
   background-color: var(--color-background-surface);
@@ -145,8 +148,10 @@ body.dark-theme .search-icon {
   max-height: 480px;
   overflow-y: auto;
   z-index: 1000;
-  display: none; /* Hidden by default, shown by JS */
-  backdrop-filter: blur(10px); /* Frosted glass effect */
+  display: none;
+  /* Hidden by default, shown by JS */
+  backdrop-filter: blur(10px);
+  /* Frosted glass effect */
   animation: slideDown 0.2s ease;
 }
 
@@ -163,6 +168,7 @@ body.dark-theme .search-results-dropdown {
     opacity: 0;
     transform: translateY(-8px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -196,7 +202,8 @@ body.dark-theme .search-results-dropdown {
   text-transform: uppercase;
   letter-spacing: 0.5px;
   color: var(--color-text-muted);
-  user-select: none; /* Prevents selecting text */
+  user-select: none;
+  /* Prevents selecting text */
   border-bottom: 1px solid var(--color-border);
 }
 
@@ -245,9 +252,8 @@ body.dark-theme .search-result-item.focused {
   border-radius: 8px;
   object-fit: cover;
   flex-shrink: 0;
-  background-color: var(
-    --color-background-muted
-  ); /* Placeholder bg for broken images */
+  background-color: var(--color-background-muted);
+  /* Placeholder bg for broken images */
 }
 
 /**
@@ -256,7 +262,8 @@ body.dark-theme .search-result-item.focused {
  */
 .search-result-info {
   flex: 1;
-  min-width: 0; /* Allows text ellipsis to work in flex */
+  min-width: 0;
+  /* Allows text ellipsis to work in flex */
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -313,7 +320,8 @@ body.dark-theme .search-result-title mark {
   color: var(--color-text-muted);
   flex-shrink: 0;
   transition: all 0.2s ease;
-  opacity: 0; /* Hidden by default */
+  opacity: 0;
+  /* Hidden by default */
 }
 
 /* Show arrow on hover/focus */
@@ -347,10 +355,12 @@ body.dark-theme .search-result-title mark {
  * Fade in/out effect for loading text
  */
 @keyframes pulse {
+
   0%,
   100% {
     opacity: 0.6;
   }
+
   50% {
     opacity: 1;
   }

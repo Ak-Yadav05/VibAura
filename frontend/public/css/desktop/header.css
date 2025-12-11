@@ -30,18 +30,6 @@
 }
 
 /**
- * SCROLL SHADOW EFFECT
- * Applied by scrollController.js when user scrolls
- */
-.nav.scrolled {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-body.dark-theme .nav.scrolled {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-}
-
-/**
  * LEFT SECTION - BRAND/LOGO
  */
 .nav-left .logo {
@@ -50,8 +38,8 @@ body.dark-theme .nav.scrolled {
 }
 
 .logo img {
-  width: 50px;
-  height: 50px;
+  width: 150px;
+  height: 55px;
 }
 
 /**
@@ -165,14 +153,11 @@ body.dark-theme .search-bar img {
 }
 
 .user-profile img {
-  width: 32px;
-  height: 32px;
+  width: 35px;
+  height: 35px;
   border-radius: 50%;
 }
 
-.user-profile span {
-  display: inline-block; /* Show user name on desktop */
-}
 
 /**
  * ICON BUTTON BASE CLASS
@@ -205,7 +190,7 @@ body.dark-theme .search-bar img {
   filter: invert(30%) sepia(90%) saturate(1500%) hue-rotate(320deg) brightness(100%);
 }
 
-body.dark-theme .icon-btn img {
+body.dark-theme .nav-controls .icon-btn img {
   filter: brightness(0) invert(1);
 }
 
@@ -228,8 +213,8 @@ body.dark-theme .icon-btn:hover img {
 }
 
 .theme-toggle img {
-  width: 24px;
-  height: 24px;
+  width: 30px;
+  height: 30px;
   transition: transform 0.4s ease, opacity 0.4s ease;
   filter: none;
 }

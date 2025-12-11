@@ -70,11 +70,10 @@ export function initScrollController() {
   // Handle scroll events for header shadow and scrollbar position
   const handleScroll = () => {
     if (contentArea.scrollTop > 1) {
-      if (navHeader) navHeader.classList.add("scrolled");
-      if (mobileHeader) mobileHeader.classList.add("scrolled");
+      // Add scrolled class to content area for inset shadow effect
+      contentArea.classList.add("scrolled");
     } else {
-      if (navHeader) navHeader.classList.remove("scrolled");
-      if (mobileHeader) mobileHeader.classList.remove("scrolled");
+      contentArea.classList.remove("scrolled");
     }
 
     if (hasCustomScrollbar) {

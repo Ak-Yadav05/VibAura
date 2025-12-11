@@ -35,7 +35,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 24px;
+  padding: 0 clamp(12px, 3vw, 24px);
   gap: 24px;
   background-color: var(--color-background-surface);
   height: 100%;
@@ -90,7 +90,8 @@
  * COLUMN 2: PLAYER CONTROLS
  */
 .player-controls {
-  width: 50%;
+  flex: 2;
+  max-width: 600px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -100,7 +101,7 @@
 .control-buttons {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: clamp(8px, 2vw, 16px);
 }
 
 /**
@@ -118,8 +119,8 @@
 }
 
 .player-btn img {
-  width: 24px;
-  height: 24px;
+  width: clamp(18px, 2.5vw, 24px);
+  height: clamp(18px, 2.5vw, 24px);
   filter: brightness(0.4);
   transition: filter 0.3s ease, transform 0.2s ease;
 }
@@ -141,16 +142,16 @@ body.dark-theme .player-btn:hover img {
  * PLAY/PAUSE BUTTON - LARGER
  */
 .play-pause-btn {
-  width: 48px;
-  height: 48px;
+  width: clamp(36px, 5vw, 48px);
+  height: clamp(36px, 5vw, 48px);
   background: rgba(0, 0, 0, 0.05);
   border-radius: 50%;
   padding: 0;
 }
 
 .play-pause-btn img {
-  width: 28px;
-  height: 28px;
+  width: clamp(20px, 3vw, 28px);
+  height: clamp(20px, 3vw, 28px);
 }
 
 body.dark-theme .play-pause-btn {
@@ -225,11 +226,11 @@ body.dark-theme .play-pause-btn {
 .volume-controls {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: clamp(8px, 1vw, 12px);
 }
 
 .volume-slider {
-  width: 120px;
+  width: clamp(80px, 10vw, 120px);
   height: 4px;
   -webkit-appearance: none;
   appearance: none;
@@ -274,7 +275,8 @@ body.dark-theme .play-pause-btn {
  * FULLSCREEN BUTTON (in volume section)
  */
 #open-fullscreen-btn {
-  display: flex; /* Visible on desktop */
+  display: flex;
+  /* Visible on desktop */
 }
 
 /**

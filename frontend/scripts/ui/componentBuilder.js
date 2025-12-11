@@ -37,7 +37,14 @@ export function createSkeletonSection(title = "Loading...", count = 8) {
 
   // Generate the HTML for the skeleton cards
   const skeletonCardsHTML = Array.from({ length: count })
-    .map(() => `<div class="skeleton-card"></div>`)
+    .map(
+      () => `
+      <div class="skeleton-card">
+        <div class="skeleton-img"></div>
+        <div class="skeleton-text title"></div>
+        <div class="skeleton-text subtitle"></div>
+      </div>`
+    )
     .join("");
 
   // Set the inner HTML of the section
