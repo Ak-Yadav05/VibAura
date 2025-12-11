@@ -179,9 +179,13 @@ function updateProgress() {
     // Calculate progress percentage
     const progressPercent = (currentTime / duration) * 100;
 
-    // Update both progress bars
+    // Update both progress bars inputs
     dom.progressBar.value = progressPercent;
     dom.fsProgressBar.value = progressPercent;
+
+    // Set CSS variable for visual "fill" effect (Spotify-like)
+    dom.progressBar.style.setProperty("--progress", `${progressPercent}%`);
+    dom.fsProgressBar.style.setProperty("--progress", `${progressPercent}%`);
 
     // Update time displays
     const formattedTime = formatTime(currentTime);
