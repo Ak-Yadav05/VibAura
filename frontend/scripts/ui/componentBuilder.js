@@ -181,8 +181,8 @@ function createCardElement(item, section, index) {
     artist.className = "artist-name";
     // Safely access nested artist name
     artist.textContent =
-      item.artist && item.artist.name
-        ? item.artist.name
+      item.artists && item.artists.length > 0
+        ? item.artists.map(a => a.name).join(", ")
         : "Unknown Artist";
     card.appendChild(artist);
   }

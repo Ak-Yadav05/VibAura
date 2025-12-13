@@ -66,16 +66,80 @@
 .song-details {
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+  max-width: 150px;
+  /* Constrain width for marquee logic */
 }
 
 .song-title {
   font-weight: bold;
   font-size: 0.9rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .song-artist {
   font-size: 0.8rem;
   color: var(--color-text-muted);
+  white-space: nowrap;
+  display: block;
+}
+
+.artist-wrapper {
+  width: 100%;
+  overflow: hidden;
+  /* Mask applied only when scrolling via .mask-active class */
+  transition: mask-image 0.2s ease;
+}
+
+.artist-wrapper.mask-active {
+  mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+}
+
+.song-artist.scrolling {
+  display: block;
+  width: max-content;
+  /* Allow full width to render */
+  padding-left: 0;
+  animation: none;
+  /* Reset */
+  animation: scroll-text var(--scroll-dur, 5s) linear forwards;
+  /* Run once and hold... but we remove class in JS */
+  /* Remove ellipsis during scroll */
+  text-overflow: clip;
+}
+
+/* Override the wrapper mask during scrolling? 
+   Actually, the mask is on the wrapper (.artist-wrapper). 
+   Moving the text inside it is what we want. 
+*/
+
+.song-artist.scrolling span {
+  flex-shrink: 0;
+}
+
+@keyframes scroll-text {
+  0% {
+    transform: translateX(0);
+  }
+
+  15% {
+    transform: translateX(0);
+  }
+
+  /* Pause briefly at start */
+  85% {
+    transform: translateX(calc(-1 * var(--scroll-dist, 100px)));
+  }
+
+  /* buffer at end */
+  100% {
+    transform: translateX(calc(-1 * var(--scroll-dist, 100px)));
+  }
+
+  /* Pause at end */
 }
 
 /**

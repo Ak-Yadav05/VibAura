@@ -387,7 +387,9 @@ export async function renderPlaylistPage(playlistId) {
       songsListRowsHTML = `<div class="playlist-song-list">`;
 
       songs.forEach((song, index) => {
-        const artistName = song.artist && song.artist.name ? song.artist.name : "Unknown Artist";
+        const artistName = (song.artists && song.artists.length > 0)
+          ? song.artists.map(a => a.name).join(", ")
+          : "Unknown Artist";
         const albumName = song.album || "Single"; // Fallback if no album
 
         songsListRowsHTML += `

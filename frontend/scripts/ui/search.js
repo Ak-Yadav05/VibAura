@@ -583,7 +583,14 @@ function createResultItem(item, type, query) {
       item.artworkUrl ||
       "https://placehold.co/48x48/E5E7EB/1E1E1E?text=🎵";
     title = highlightMatch(item.title, query);
-    subtitle = item.artist?.name || "Unknown Artist";
+
+    // Handle multiple artists
+    if (item.artists && item.artists.length > 0) {
+      const artistNames = item.artists.map(a => a.name).join(", ");
+      subtitle = artistNames; // Highlight match logic could be added here if needed, but keeping it simple
+    } else {
+      subtitle = "Unknown Artist";
+    }
   }
   // --- Artist Result ---
   else if (type === "artist") {
@@ -677,8 +684,9 @@ function handleResultClick(id, type) {
       // Play the song by creating a new playlist with just this one song
       playSongFromPlaylist([song], 0);
       console.log(
-        `[Search] Playing song: "${song.title}" by ${
-          song.artist?.name || "Unknown"
+        `[Search] Playing song: "${song.title}" by ${(song.artists && song.artists.length > 0)
+          ? song.artists.map(a => a.name).join(", ")
+          : "Unknown Artist"
         }`
       );
     } else {

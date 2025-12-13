@@ -248,9 +248,13 @@ body.dark-theme .content.scrolled {
   color: var(--color-text-muted);
   width: 100%;
   text-align: left;
-  margin-left: 15px;
-  padding-left: 10px;
+  /* margin-left: 15px;
+  padding-left: 10px; */
   margin-top: -4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 170px; /* Constrain width to prevent overflow */
 }
 
 /**

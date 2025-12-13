@@ -260,11 +260,6 @@ body.fullscreen-open .fullscreen-player {
   transition: height 0.2s ease;
 }
 
-#fullscreen-progress-bar:hover {
-  height: 8px;
-  /* Expand on hover */
-}
-
 /* Progress Bar Thumb */
 #fullscreen-progress-bar::-webkit-slider-thumb {
   -webkit-appearance: none;

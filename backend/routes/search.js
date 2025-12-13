@@ -125,8 +125,8 @@ router.get('/', async (req, res) => {
  */
 async function searchSongs(query) {
   try {
-  debug(`[Search] Searching songs for: "${query}"`);
-    
+    debug(`[Search] Searching songs for: "${query}"`);
+
     // First, try MongoDB Atlas Search (requires Atlas Search indexes)
     try {
       const searchResults = await Song.aggregate([
@@ -151,7 +151,7 @@ async function searchSongs(query) {
       // If Atlas Search returns results, populate artist and return
       if (searchResults.length > 0) {
         info(`[Search] Atlas Search found ${searchResults.length} songs`);
-        return await Song.populate(searchResults, { path: 'artist' });
+        return await Song.populate(searchResults, { path: 'artists' });
       }
     } catch (atlasError) {
       // Atlas Search not available, fall through to regex
@@ -164,13 +164,13 @@ async function searchSongs(query) {
     // Create case-insensitive regex for title matching
     const titleRegex = new RegExp(query, 'i');
 
-  debug(`[Search] Using regex fallback with pattern: ${titleRegex}`);
+    debug(`[Search] Using regex fallback with pattern: ${titleRegex}`);
 
     // Search by title
     const songs = await Song.find({
       title: titleRegex,
     })
-      .populate('artist')
+      .populate('artists')
       .sort({
         isFeatured: -1, // Featured songs first
         title: 1,
@@ -199,8 +199,8 @@ async function searchSongs(query) {
  */
 async function searchArtists(query) {
   try {
-  debug(`[Search] Searching artists for: "${query}"`);
-    
+    debug(`[Search] Searching artists for: "${query}"`);
+
     // Try MongoDB Atlas Search first
     try {
       const searchResults = await Artist.aggregate([
@@ -236,7 +236,7 @@ async function searchArtists(query) {
     // ========================================
     const nameRegex = new RegExp(query, 'i');
 
-  debug(`[Search] Using regex fallback for artists with pattern: ${nameRegex}`);
+    debug(`[Search] Using regex fallback for artists with pattern: ${nameRegex}`);
 
     const artists = await Artist.find({
       name: nameRegex,
@@ -269,8 +269,8 @@ async function searchArtists(query) {
  */
 async function searchPlaylists(query) {
   try {
-  debug(`[Search] Searching playlists for: "${query}"`);
-    
+    debug(`[Search] Searching playlists for: "${query}"`);
+
     // Try MongoDB Atlas Search first
     try {
       const searchResults = await Playlist.aggregate([
@@ -307,7 +307,7 @@ async function searchPlaylists(query) {
     const nameRegex = new RegExp(query, 'i');
     const descRegex = new RegExp(query, 'i');
 
-  debug(`[Search] Using regex fallback for playlists with pattern: ${nameRegex}`);
+    debug(`[Search] Using regex fallback for playlists with pattern: ${nameRegex}`);
 
     const playlists = await Playlist.find({
       $or: [

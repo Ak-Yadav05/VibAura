@@ -31,19 +31,120 @@ import { formatTime } from "../utils/utils.js";
  * @returns {void}
  */
 function loadSong(song) {
-  // Safely get artist name, providing a fallback
-  const artistName =
-    song.artist && song.artist.name ? song.artist.name : "Unknown Artist";
+  // Safely get artist name(s), providing a fallback
+  let artistHTML = "Unknown Artist";
+  let artistName = "Unknown Artist"; // Restore for textContent usage
+
+  if (song.artists && song.artists.length > 0) {
+    const primary = song.artists[0].name;
+    const others = song.artists.slice(1).map(a => `, ${a.name}`).join("");
+
+    artistName = song.artists.map(a => a.name).join(", ");
+    artistHTML = `<span class="primary-artist">${primary}</span><span class="secondary-artist">${others}</span>`;
+  }
 
   // --- Update mini-player UI ---
   dom.songTitleEl.textContent = song.title;
-  dom.songArtistEl.textContent = artistName;
+  // Use HTML to allow css hiding of secondary artists on mobile
+  dom.songArtistEl.innerHTML = artistHTML;
   dom.songAlbumArtEl.src = song.artworkUrl;
+
+  // Check for overflow and setup interaction-based scroll
+  dom.songArtistEl.classList.remove("scrolling");
+  // Ensure we are using the HTML structure which might be hidden on mobile
+  dom.songArtistEl.innerHTML = artistHTML;
+
+  // Clean up any existing on-event handlers to prevent leaks/conflicts
+  dom.songArtistEl.onmouseenter = null;
+  dom.songArtistEl.onanimationend = null;
+
+  const checkOverflow = () => {
+    // Parent is the wrapper which has fixed/constrained width
+    const parentWidth = dom.songArtistEl.parentElement.clientWidth;
+    const contentWidth = dom.songArtistEl.scrollWidth;
+
+    if (contentWidth > parentWidth) {
+      // Calculate distance to scroll: (Content Width - Wrapper Width)
+      // Add a little buffer so it scrolls completely past the fade/mask if needed
+      const distance = contentWidth - parentWidth + 20;
+      dom.songArtistEl.style.setProperty('--scroll-dist', `${distance}px`);
+
+      // Duration: e.g. 50px per second
+      const duration = Math.max(distance / 40, 2); // Minimum 2s
+      dom.songArtistEl.style.setProperty('--scroll-dur', `${duration}s`);
+
+      const triggerAnimation = () => {
+        dom.songArtistEl.classList.remove("scrolling");
+        dom.songArtistEl.parentElement.classList.remove("mask-active");
+        // Force reflow
+        void dom.songArtistEl.offsetWidth;
+        dom.songArtistEl.classList.add("scrolling");
+        dom.songArtistEl.parentElement.classList.add("mask-active");
+      };
+
+      // Trigger on Hover
+      dom.songArtistEl.onmouseenter = triggerAnimation;
+
+      // Cleanup class after animation to snap back to ellipsis
+      dom.songArtistEl.onanimationend = () => {
+        dom.songArtistEl.classList.remove("scrolling");
+        dom.songArtistEl.parentElement.classList.remove("mask-active");
+      };
+
+      // Initial Trigger (When song is loaded/played)
+      // Add a small delay for UI to settle
+      setTimeout(triggerAnimation, 500);
+    }
+  };
+
+  // Run check slightly async to ensure DOM updates and layout are applied
+  setTimeout(checkOverflow, 100);
 
   // --- Update fullscreen player UI ---
   dom.fsSongTitle.textContent = song.title;
   dom.fsSongArtist.textContent = artistName;
   dom.fsAlbumArt.src = song.artworkUrl;
+
+  // Check fullscreen overflow if it's visible
+  const checkFullscreenOverflow = () => {
+    const fsArtist = dom.fsSongArtist;
+    // Reset
+    fsArtist.classList.remove("fs-scrolling");
+
+    // Only verify if visible (otherwise measurements are 0)
+    // We check if the fullscreen container has the 'open' class
+    if (dom.fullscreenPlayer.classList.contains("open")) {
+      // Force reflow
+      void fsArtist.offsetWidth;
+
+      // Parent container width (max-width is set in CSS)
+      // But here we can just check if scrollWidth > clientWidth
+      if (fsArtist.scrollWidth > fsArtist.clientWidth) {
+        const distance = fsArtist.scrollWidth - fsArtist.clientWidth;
+        // Pass the distance to CSS
+        fsArtist.style.setProperty('--fs-scroll-dist', `${distance + 10}px`);
+        // Calculate duration based on distance (slower is better for reading)
+        const duration = Math.max((distance + 10) / 30, 3);
+        fsArtist.style.setProperty('--fs-scroll-dur', `${duration}s`);
+
+        fsArtist.classList.add("fs-scrolling");
+      }
+    }
+  };
+
+  // Run immediately if open, or rely on openFullscreenPlayer to trigger it later
+  // We expose this or attach it to the DOM/State if needed? 
+  // Actually, simplest is to attach it to the `dom` object or a global handler, 
+  // but for now let's just run it if open.
+  if (dom.fullscreenPlayer.classList.contains("open")) {
+    setTimeout(checkFullscreenOverflow, 100);
+  }
+
+  // Attach this checker to the openFullscreenPlayer function logic?
+  // We can't modify `openFullscreenPlayer` easily from inside `loadSong`.
+  // Instead, let's export a helper or just modify `openFullscreenPlayer` below.
+  // For now, attaching checking logic to a property on dom to reuse it
+  dom.checkFullscreenOverflow = checkFullscreenOverflow;
 
   // --- Load audio source ---
   dom.audio.src = song.fileUrl;
@@ -171,7 +272,13 @@ function toggleRepeat() {
  *
  * @returns {void}
  */
+let isDragging = false;
+
 function updateProgress() {
+  // If user is dragging the slider, DON'T update the values from audio time
+  // This prevents "fighting" between the drag position and the audio update
+  if (isDragging) return;
+
   const { duration, currentTime } = dom.audio;
 
   // Check if duration is available (it might be NaN on load)
@@ -223,6 +330,12 @@ function setProgressFromInput(inputElement) {
 function openFullscreenPlayer() {
   dom.fullscreenPlayer.classList.add("open");
   document.body.classList.add("fullscreen-open"); // Prevents page content scrolling
+
+  // Trigger overflow check for marquee
+  if (dom.checkFullscreenOverflow) {
+    // Small timeout to allow transition/display:flex to apply
+    setTimeout(dom.checkFullscreenOverflow, 100);
+  }
 
   // Attach touch listeners for swipe gesture
   dom.fullscreenPlayer.addEventListener("touchstart", handleTouchStart, false);
@@ -290,6 +403,11 @@ function handleTouchMove(e) {
 
   // If the player is open, prevent default browser scroll behavior
   if (isFullyOpen) {
+    // CRITICAL FIX: Allow interaction with the progress bar inputs
+    // If the target is one of the progress bars, do NOT prevent default
+    if (e.target === dom.progressBar || e.target === dom.fsProgressBar) {
+      return;
+    }
     e.preventDefault();
   }
 }
@@ -382,4 +500,22 @@ export function initPlayer() {
   dom.fsProgressBar.addEventListener("input", () =>
     setProgressFromInput(dom.fsProgressBar)
   );
+
+  // --- Dragging state listeners (to pause updates while scrubbing) ---
+  const startDrag = () => { isDragging = true; };
+  const endDrag = () => { isDragging = false; };
+
+  dom.progressBar.addEventListener("mousedown", startDrag);
+  dom.progressBar.addEventListener("mouseup", endDrag);
+  dom.progressBar.addEventListener("touchstart", startDrag, { passive: true });
+  dom.progressBar.addEventListener("touchend", endDrag);
+
+  dom.fsProgressBar.addEventListener("mousedown", startDrag);
+  dom.fsProgressBar.addEventListener("mouseup", endDrag);
+  dom.fsProgressBar.addEventListener("touchstart", startDrag, { passive: true });
+  dom.fsProgressBar.addEventListener("touchend", endDrag);
+
+  // Also catch 'change' as end of drag for accessibility/keyboard
+  dom.progressBar.addEventListener("change", endDrag);
+  dom.fsProgressBar.addEventListener("change", endDrag);
 }

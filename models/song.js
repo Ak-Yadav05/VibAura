@@ -18,13 +18,12 @@ const songSchema = new Schema({
     required: true
   },
 
-  // Reference to the Artist document
-  // This creates a link to a document in the 'Artist' collection.
-  artist: {
+  // Array of references to Artist documents
+  // This allows for multiple artists per song
+  artists: [{
     type: Schema.Types.ObjectId,
-    ref: 'Artist',
-    required: true
-  },
+    ref: 'Artist'
+  }],
 
   // Duration of the song, stored in seconds
   duration: {

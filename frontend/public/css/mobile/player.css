@@ -72,19 +72,29 @@
 }
 
 .song-title {
-  font-weight: bold;
-  font-size: 0.8rem;
+  font-weight: 700;
+  font-size: 0.9rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
+.artist-wrapper{
+  margin-top: -5px;
+}
+
 .song-artist {
   font-size: 0.7rem;
+  font-weight: 500;
   color: var(--color-text-muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* On mobile, only show the first artist */
+.secondary-artist {
+  display: none;
 }
 
 /**

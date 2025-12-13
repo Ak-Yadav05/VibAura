@@ -82,24 +82,39 @@ except Exception as e:
 # ==============================
 
 def get_or_create_artist(artist_data):
-    """Get or create artist in MongoDB"""
+    """Get or create artist in MongoDB with Spotify ID support"""
     try:
         artist_name = artist_data.get("name", "Unknown Artist")
+        spotify_artist_id = artist_data.get("id")
         
-        # Check if artist already exists
-        existing = db.artists.find_one({"name": artist_name})
-        if existing:
-            debug(f"Artist exists: {artist_name}")
-            return existing["_id"]
+        # 1. Try finding by Spotify ID first (most accurate)
+        if spotify_artist_id:
+            existing_by_id = db.artists.find_one({"spotifyArtistId": spotify_artist_id})
+            if existing_by_id:
+                return existing_by_id["_id"]
+
+        # 2. Fallback: Check by name
+        existing_by_name = db.artists.find_one({"name": artist_name})
+        if existing_by_name:
+            # Found by name but checking if we need to backfill Spotify ID
+            if spotify_artist_id and not existing_by_name.get("spotifyArtistId"):
+                db.artists.update_one(
+                    {"_id": existing_by_name["_id"]},
+                    {"$set": {"spotifyArtistId": spotify_artist_id}}
+                )
+                debug(f"ℹ️  Updated artist '{artist_name}' with Spotify ID")
+            
+            return existing_by_name["_id"]
         
-        # Create new artist with artwork from Spotify
+        # 3. Create new artist
         artist_doc = {
             "name": artist_name,
+            "spotifyArtistId": spotify_artist_id,
             "artworkUrl": artist_data.get("images", [{}])[0].get("url", "") if artist_data.get("images") else "",
             "isFeatured": False,
         }
         result = db.artists.insert_one(artist_doc)
-        info(f"✅ Created artist: {artist_name}")
+        info(f"✅ Created/Imported artist: {artist_name}")
         return result.inserted_id
     except Exception as e:
         error(f"Error creating artist: {str(e)}")
@@ -241,7 +256,17 @@ def process_song(song_info):
             return {"status": "failed", "reason": "spotify_fetch", "folder": folder_name}
         
         official_title = track_data["name"]
-        artist_data = track_data["artists"][0]  # Get artist info
+        
+        # Process ALL artists
+        artist_ids = []
+        for ad in track_data["artists"]:
+            a_id = get_or_create_artist(ad)
+            if a_id:
+                artist_ids.append(a_id)
+        
+        if not artist_ids:
+             return {"status": "failed", "reason": "no_artists", "folder": folder_name}
+
         artwork_url = track_data["album"]["images"][0]["url"] if track_data.get("album", {}).get("images") else ""
         
         # Upload to Cloudinary
@@ -252,15 +277,10 @@ def process_song(song_info):
         # Extract duration from local file
         duration = extract_duration(audio_file)
         
-        # Get or create artist
-        artist_id = get_or_create_artist(artist_data)
-        if not artist_id:
-            return {"status": "failed", "reason": "artist_creation", "folder": folder_name}
-        
         # Create song document (matching VibAura Song schema)
         song_doc = {
             "title": official_title,
-            "artist": artist_id,
+            "artists": artist_ids,
             "duration": duration,
             "fileUrl": file_url,
             "artworkUrl": artwork_url,
@@ -282,7 +302,8 @@ def process_song(song_info):
                 )
                 info(f"✅ Added to playlist: {folder_name}")
         
-        info(f"✅ Processed: {official_title} by {artist_data['name']} (folder: {folder_name})")
+        first_artist_name = track_data['artists'][0]['name']
+        info(f"✅ Processed: {official_title} by {first_artist_name} (+{len(artist_ids)-1} others) (folder: {folder_name})")
         return {"status": "success", "song_id": str(song_id), "folder": folder_name}
     
     except Exception as e:

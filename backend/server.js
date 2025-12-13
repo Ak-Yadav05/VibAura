@@ -58,6 +58,7 @@ app.get("/api/songs/featured", async (req, res) => {
   try {
     const featuredSongs = await Song.find({ isFeatured: true })
       .populate({ path: "artist", model: "Artist" })
+      .populate({ path: "artists", model: "Artist" })
       .lean();
     res.json(featuredSongs);
   } catch (err) {
@@ -70,6 +71,7 @@ app.get("/api/songs", async (req, res) => {
   try {
     const songs = await Song.find()
       .populate({ path: "artist", model: "Artist" })
+      .populate({ path: "artists", model: "Artist" })
       .lean();
     res.json(songs);
   } catch (err) {
@@ -82,6 +84,7 @@ app.get("/api/songs/:id", async (req, res) => {
   try {
     const song = await Song.findById(req.params.id)
       .populate({ path: "artist", model: "Artist" })
+      .populate({ path: "artists", model: "Artist" })
       .lean();
     if (!song) return res.status(404).json({ message: "Song not found" });
     res.json(song);
@@ -116,7 +119,7 @@ app.get("/api/artists/:id", async (req, res) => {
   try {
     const artist = await Artist.findById(req.params.id).lean();
     if (!artist) return res.status(404).json({ message: "Artist not found" });
-    const songs = await Song.find({ artist: artist._id }).lean();
+    const songs = await Song.find({ artists: artist._id }).lean();
     res.json({ artist, songs });
   } catch (err) {
     error("Error fetching artist details:", err);
@@ -139,7 +142,9 @@ app.get("/api/playlists/:id", async (req, res) => {
   try {
     const playlist = await Playlist.findById(req.params.id).populate({
       path: "songs",
-      populate: { path: "artist", model: "Artist" },
+      populate: [
+        { path: "artists", model: "Artist" }
+      ],
     });
     if (!playlist) return res.status(404).json({ message: "Playlist not found" });
     res.json(playlist);
@@ -176,10 +181,14 @@ app.get("/api/homepage", async (req, res) => {
           if (!s.category || cat === 'featured' || cat === 'isfeatured') query = { isFeatured: true };
           else query = s.category ? { category: s.category } : { isFeatured: true };
 
-          const list = await Song.find(query).limit(limit).populate({ path: 'artist', model: 'Artist' }).lean();
+          const list = await Song.find(query).limit(limit)
+            .populate({ path: 'artists', model: 'Artist' })
+            .lean();
           if (query.isFeatured === true && list.length < limit) {
             const needed = limit - list.length;
-            const extra = await Song.find({ isFeatured: { $ne: true } }).limit(needed).populate({ path: 'artist', model: 'Artist' }).lean();
+            const extra = await Song.find({ isFeatured: { $ne: true } }).limit(needed)
+              .populate({ path: 'artists', model: 'Artist' })
+              .lean();
             return extra.length ? [...list, ...extra] : list;
           }
           return list;
@@ -187,7 +196,11 @@ app.get("/api/homepage", async (req, res) => {
         playlist: async (s) => {
           const limit = s.limit || 1;
           const cat = s.category || '';
-          const pls = await Playlist.find(cat ? { category: cat } : {}).limit(limit).populate({ path: 'songs', populate: { path: 'artist', model: 'Artist' } }).lean();
+          const pls = await Playlist.find(cat ? { category: cat } : {}).limit(limit).populate({
+            path: 'songs', populate: [
+              { path: 'artists', model: 'Artist' }
+            ]
+          }).lean();
           return pls;
         },
         artist: async (s) => {
@@ -228,7 +241,8 @@ app.get("/api/homepage", async (req, res) => {
       try {
         const featuredSongs = await Song.find({ isFeatured: true })
           .limit(10)
-          .populate({ path: "artist", model: "Artist" })
+          .limit(10)
+          .populate({ path: "artists", model: "Artist" })
           .lean();
 
         let section1Songs = featuredSongs;
@@ -236,7 +250,8 @@ app.get("/api/homepage", async (req, res) => {
           const needed = 10 - featuredSongs.length;
           const regular = await Song.find({ isFeatured: { $ne: true } })
             .limit(needed)
-            .populate({ path: "artist", model: "Artist" })
+            .limit(needed)
+            .populate({ path: "artists", model: "Artist" })
             .lean();
           section1Songs = [...featuredSongs, ...regular];
         }
@@ -254,7 +269,9 @@ app.get("/api/homepage", async (req, res) => {
         try {
           const playlists = await Playlist.find({ category }).limit(1).populate({
             path: "songs",
-            populate: { path: "artist", model: "Artist" },
+            populate: [
+              { path: "artists", model: "Artist" }
+            ],
           }).lean();
           if (playlists.length) {
             payload.push({ title, type: "playlist", songs: playlists, order });

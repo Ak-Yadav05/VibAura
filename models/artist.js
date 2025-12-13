@@ -19,6 +19,13 @@ const artistSchema = new Schema({
     unique: true // Ensures no duplicate artist names
   },
 
+  // Spotify Artist ID for syncing/linking
+  spotifyArtistId: {
+    type: String,
+    unique: true,
+    sparse: true // Allows multiple documents to have no spotifyArtistId
+  },
+
   // URL to the artist's primary image
   artworkUrl: {
     type: String,
