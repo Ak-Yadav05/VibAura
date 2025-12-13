@@ -22,6 +22,9 @@ import {
   renderPlaylistPage,
   renderLibraryPage,
   renderSearchPage,
+  renderLoginPage,
+  renderSignupPage,
+  setAuthMode
 } from "../ui/pageRenderer.js";
 
 // DOM elements for routing and navigation state
@@ -114,7 +117,7 @@ export async function router() {
   const isHomePage = hash === "" || hash === "#" || hash === "#home";
   if (isHomePage) {
     // This await ensures the homepage content only renders *after* the splash is gone.
-    await window.splashAnimationDone;
+    // await window.splashAnimationDone;
   }
 
   // Route to appropriate page based on URL hash
@@ -122,25 +125,38 @@ export async function router() {
 
   if (hash === "#library") {
     // --- Library Page (Mobile) ---
+    setAuthMode(false);
     console.log("[Router] Rendering library page");
     renderLibraryPage();
   } else if (hash === "#search") {
     // --- Search Page (Mobile) ---
+    setAuthMode(false);
     console.log("[Router] Rendering search page");
     renderSearchPage();
   } else if (hash.startsWith("#/artist/")) {
     // --- Artist Detail Page ---
+    setAuthMode(false);
     const artistId = hash.substring(9); // Get the ID after "#/artist/"
     console.log(`[Router] Rendering artist page for ID: ${artistId}`);
     renderArtistPage(artistId);
   } else if (hash.startsWith("#/playlist/")) {
     // --- Playlist Detail Page ---
+    setAuthMode(false);
     const playlistId = hash.substring(11); // Get the ID after "#/playlist/"
     console.log(`[Router] Rendering playlist page for ID: ${playlistId}`);
     renderPlaylistPage(playlistId);
+  } else if (hash === "#/login") {
+    // --- Login Page ---
+    console.log("[Router] Rendering login page");
+    renderLoginPage();
+  } else if (hash === "#/signup") {
+    // --- Signup Page ---
+    console.log("[Router] Rendering signup page");
+    renderSignupPage();
   } else {
     // --- Home Page (Default) ---
     // Default to home page for root hash (#), empty hash, or unrecognized routes
+    setAuthMode(false);
     console.log("[Router] Rendering home page (default)");
     renderHomePage();
   }

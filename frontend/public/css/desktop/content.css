@@ -15,15 +15,18 @@
  */
 .content {
   width: 80%;
+  /* Maintain layout */
   padding: 30px 5px 0 20px;
-  height: calc(100% - 100px);
+  height: 100%;
+  /* Fill parent exactly */
   overflow-y: scroll;
   position: relative;
   border-radius: 20px 0px 0px 20px;
   background-color: var(--color-background-muted);
   scrollbar-width: none;
-  /* box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1); -> REMOVED to prevent bottom shadow */
   transition: box-shadow 0.3s ease;
+  flex: 1;
+  min-height: 0;
 }
 
 .content.no-padding {
@@ -254,7 +257,8 @@ body.dark-theme .content.scrolled {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 170px; /* Constrain width to prevent overflow */
+  max-width: 170px;
+  /* Constrain width to prevent overflow */
 }
 
 /**

@@ -51,6 +51,8 @@ app.get("/api/debug/songs-count", async (req, res) => {
 });
 
 // Mount search routes
+const authRoutes = require("./routes/auth");
+app.use("/api/auth", authRoutes); // Login/Signup
 app.use("/api/search", searchRoutes);
 
 // --- Songs ---

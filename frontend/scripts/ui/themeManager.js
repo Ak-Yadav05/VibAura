@@ -1,122 +1,135 @@
 /**
  * ============================================================================
- * VibAura Theme Manager - Dark/Light Mode Management
+ * VibAura Theme Manager - Smart 3-State Mode
  * ============================================================================
  *
- * Manages application theme switching between light and dark modes.
- * Persists user preference to localStorage and respects OS/system preference
- * as a fallback when no manual selection is made.
+ * Manages application theme switching with 3 modes:
+ * 1. AUTO (Default) - Follows System Preference
+ * 2. LIGHT - Forces Light Mode
+ * 3. DARK - Forces Dark Mode
  *
- * Features:
- * - Toggles dark/light theme with immediate visual update.
- * - Persists user preference to localStorage.
- * - Detects system OS preference (prefers-color-scheme).
- * - Listens for OS-level theme changes and updates if no user preference is set.
- * - Updates all UI toggle buttons (desktop and mobile) on theme change.
- *
- * CSS variable organization:
- * - Light mode colors are defined in :root (base.css).
- * - Dark mode overrides are in body.dark-theme (base.css).
- * ============================================================================
-*/
+ * Cycle: Auto -> Light -> Dark -> Auto
+ */
 
 const body = document.body;
 
 /**
- * Applies the specified theme to the document and updates theme toggle UI.
- * It adds or removes the "dark-theme" class on the <body> element, which
- * triggers all CSS variable overrides for dark mode.
- *
- * @param {string} theme - The theme to apply: "dark" or "light"
- * @returns {void}
+ * Access Safe LocalStorage
+ * Returns null if access is denied/error
+ */
+function getSafeStorage(key) {
+  try {
+    return localStorage.getItem(key);
+  } catch (e) {
+    console.warn("[ThemeManager] Storage access denied, utilizing fallback.");
+    return null;
+  }
+}
+
+function setSafeStorage(key, value) {
+  try {
+    if (value === null) {
+      localStorage.removeItem(key);
+    } else {
+      localStorage.setItem(key, value);
+    }
+  } catch (e) {
+    console.warn("[ThemeManager] Storage access denied, cannot save preference.");
+  }
+}
+
+/**
+ * Applies the specified theme logic and updates UI icons.
+ * 
+ * @param {string|null} theme - "light", "dark", or null (for Auto)
  */
 function applyTheme(theme) {
-  const isDarkMode = theme === "dark";
+  let isDark = false;
 
-  // Toggle the main theme class on the body
-  body.classList.toggle("dark-theme", isDarkMode);
+  // 1. Determine effective theme (Dark or Light)
+  if (theme === "dark") {
+    isDark = true;
+  } else if (theme === "light") {
+    isDark = false;
+  } else {
+    // Auto Mode: Use System Preference
+    isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  }
 
-  // Update sun/moon icons on *all* theme toggle buttons
-  // (e.g., one for desktop, one for mobile header)
+  // 2. Apply to Body
+  if (isDark) {
+    body.classList.add("dark-theme");
+  } else {
+    body.classList.remove("dark-theme");
+  }
+
+  // 3. Update Icons (Sun vs Moon vs Auto)
   const toggles = document.querySelectorAll(".theme-toggle");
   toggles.forEach((toggle) => {
     const sunIcon = toggle.querySelector(".sun-icon");
     const moonIcon = toggle.querySelector(".moon-icon");
+    const autoIcon = toggle.querySelector(".auto-icon");
 
-    if (sunIcon && moonIcon) {
-      // Show moon icon in dark mode, sun icon in light mode
-      sunIcon.style.display = isDarkMode ? "none" : "block";
-      moonIcon.style.display = isDarkMode ? "block" : "none";
+    // Reset all
+    if (sunIcon) sunIcon.style.display = "none";
+    if (moonIcon) moonIcon.style.display = "none";
+    if (autoIcon) autoIcon.style.display = "none";
+
+    // Show active state icon
+    if (!theme || theme === "auto") {
+      if (autoIcon) autoIcon.style.display = "block";
+    } else if (theme === "light") {
+      if (sunIcon) sunIcon.style.display = "block";
+    } else if (theme === "dark") {
+      if (moonIcon) moonIcon.style.display = "block";
     }
   });
 }
 
 /**
- * Toggles the active theme between light and dark modes.
- * Saves the user's *explicit* preference to localStorage for persistence
- * across sessions. Immediately applies the new theme.
- *
- * @exports toggleTheme
- * @returns {void}
+ * Toggles the theme in a cycle: Auto -> Light -> Dark -> Auto
  */
 export function toggleTheme() {
-  // Determine the *new* theme
-  const currentTheme = body.classList.contains("dark-theme") ? "light" : "dark";
+  const currentSaved = getSafeStorage("vibAuraTheme"); // null, "light", "dark"
+  let newTheme = null;
 
-  // Save this choice to localStorage
-  localStorage.setItem("vibAuraTheme", currentTheme);
+  if (!currentSaved || currentSaved === "auto") {
+    newTheme = "light";
+  } else if (currentSaved === "light") {
+    newTheme = "dark";
+  } else {
+    newTheme = "auto"; // Back to Auto (clears preference)
+  }
 
-  // Apply the new theme
-  applyTheme(currentTheme);
+  // Save Preference
+  setSafeStorage("vibAuraTheme", newTheme === "auto" ? null : newTheme);
+
+  // Apply
+  applyTheme(newTheme === "auto" ? null : newTheme);
 }
 
 /**
- * Initializes the theme manager on application startup.
- * Called once by app.js.
- *
- * Theme selection priority:
- * 1. User's saved preference (localStorage) - This overrides system preference.
- * 2. System OS preference (prefers-color-scheme media query).
- * 3. Default to light theme (if system preference is not available).
- *
- * Also attaches click listeners to all theme toggle buttons.
- *
- * @exports initThemeManager
- * @returns {void}
+ * Initializes the theme manager.
  */
 export function initThemeManager() {
-  const savedTheme = localStorage.getItem("vibAuraTheme");
+  const savedTheme = getSafeStorage("vibAuraTheme");
 
-  if (savedTheme) {
-    // 1. User has manually set a theme preference - use this saved choice.
-    applyTheme(savedTheme);
-  } else {
-    // 2. No saved preference - check system OS preference.
-    const prefersDark =
-      window.matchMedia &&
-      window.matchMedia("(prefers-color-scheme: dark)").matches;
-    applyTheme(prefersDark ? "dark" : "light");
-  }
+  // Apply initial state
+  applyTheme(savedTheme);
 
-  // Attach listener to desktop theme toggle button
+  // Attach Listeners
   const desktopToggle = document.getElementById("theme-toggle");
-  if (desktopToggle) {
-    desktopToggle.addEventListener("click", toggleTheme);
-  }
+  if (desktopToggle) desktopToggle.addEventListener("click", toggleTheme);
 
-  // Attach listener to mobile theme toggle button
   const mobileToggle = document.getElementById("mobile-theme-toggle");
-  if (mobileToggle) {
-    mobileToggle.addEventListener("click", toggleTheme);
-  }
+  if (mobileToggle) mobileToggle.addEventListener("click", toggleTheme);
 
-  // Listen for OS-level theme changes (e.g., user's OS switches at sunset)
+  // Listen for System Changes (Only affects AUTO mode)
   window
     .matchMedia("(prefers-color-scheme: dark)")
-    .addEventListener("change", (event) => {
-      // *Only* apply the change if the user hasn't manually set a theme.
-      if (!localStorage.getItem("vibAuraTheme")) {
-        applyTheme(event.matches ? "dark" : "light");
+    .addEventListener("change", (e) => {
+      if (!getSafeStorage("vibAuraTheme")) {
+        applyTheme(null); // Re-evaluate Auto logic
       }
     });
 }

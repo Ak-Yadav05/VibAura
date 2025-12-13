@@ -153,14 +153,18 @@ body {
   display: flex;
   flex-direction: row;
   /* Sidebar (left) + Content (right) */
+  /* flex: 1 1 0%; */
   flex: 1;
-  /* Takes up all available space between header and player */
+  /* Fallback for flexibility */
+
+  height: calc(100vh - 170px);
+  /* CRITICAL FIX: Header(70) + Player(90) + Gap(10) = 170px */
+
   min-height: 0;
-  /* Fixes flexbox overflow issues */
-  /* background-image: linear-gradient(
-    135deg,
-    var(--color-gradient-start),
-    var(--color-gradient-end)
-  ); */
+
   background-color: var(--color-background-surface);
+  overflow: hidden;
+  /* CRITICAL FIX: Forces main to stay within flex bounds */
+  position: relative;
+  /* Supports absolute positioning of children */
 }

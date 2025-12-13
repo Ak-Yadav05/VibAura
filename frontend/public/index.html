@@ -5,6 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>VibAura</title>
+  <link rel="icon" href="images/music.png" type="image/png">
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -12,6 +13,7 @@
     rel="stylesheet" />
   <link rel="stylesheet" href="css/base/skeleton.css" />
   <link rel="stylesheet" href="css/components/search.css" />
+  <link rel="stylesheet" href="css/components/auth.css" />
   <link rel="stylesheet" href="css/desktop/index.css" media="(min-width: 769px)" />
   <link rel="stylesheet" href="css/mobile/index.css" media="(max-width: 768px)" />
 
@@ -73,16 +75,16 @@
 <body>
   <script>
     (function () {
-      // Get saved theme preference or detect system preference
+      // Get saved theme preference (light, dark, or auto/null)
       const savedTheme = localStorage.getItem("vibAuraTheme");
-      const prefersDark = window.matchMedia(
-        "(prefers-color-scheme: dark)"
-      ).matches;
+      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
 
-      // Determine which theme to apply
-      const shouldBeDark = savedTheme ? savedTheme === "dark" : prefersDark;
+      // Logic: 
+      // 1. "dark" -> Always Dark
+      // 2. "light" -> Always Light
+      // 3. "auto" or null -> Use System Preference
+      const shouldBeDark = savedTheme === "dark" || ((savedTheme === "auto" || !savedTheme) && prefersDark);
 
-      // Apply theme before anything renders
       if (shouldBeDark) {
         document.body.classList.add("dark-theme");
       } else {
@@ -97,7 +99,10 @@
     </div>
   </div>
 
-  <div class="container">
+  <!-- Auth Root: Specialized container for Login/Signup views -->
+  <div id="auth-root" style="display: none;"></div>
+
+  <div class="container" id="app-root">
     <header class="mobile-header">
       <div class="nav-left">
         <div class="logo">
@@ -109,6 +114,7 @@
         <div class="theme-toggle" id="mobile-theme-toggle">
           <img src="images/icons/sun.png" class="sun-icon" alt="Sun Icon" />
           <img src="images/icons/moon.png" class="moon-icon" style="display: none" alt="Moon Icon" />
+          <img src="images/icons/auto.png" class="auto-icon" style="display: none" alt="Auto Icon" />
         </div>
         <div class="user-profile">
           <img src="https://placehold.co/32x32/DBEAFE/2563EB?text=A" alt="User Avatar" />
@@ -144,6 +150,7 @@
         <div class="theme-toggle icon-btn" id="theme-toggle">
           <img src="images/icons/sun.png" class="sun-icon" alt="Sun Icon" />
           <img src="images/icons/moon.png" class="moon-icon" style="display: none" alt="Moon Icon" />
+          <img src="images/icons/auto.png" class="auto-icon" style="display: none" alt="Auto Icon" />
         </div>
         <div class="user-profile">
           <img src="https://placehold.co/32x32/DBEAFE/2563EB?text=A" alt="User Avatar" />

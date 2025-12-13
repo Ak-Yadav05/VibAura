@@ -12,19 +12,22 @@
  */
 
 .content {
+  position: relative !important;
   width: 100% !important;
-  padding-top: 80px !important;
-  padding-bottom: calc(60px + 50px + 30px) !important;
-  /* padding-left: 10px !important; */
-  /* padding-right: 10px !important; */
-  height: 100%;
-  overflow-y: auto;
+  height: 100% !important;
+
+  padding-top: 20px !important;
+  padding-bottom: 80px !important;
+  /* Space for mini-player */
+
+  overflow-y: auto !important;
   -webkit-overflow-scrolling: touch;
-  position: relative;
+
   border-radius: 0;
   background-color: var(--color-background-surface);
   scrollbar-width: none;
   -ms-overflow-style: none;
+  z-index: 2;
 }
 
 /* Hide native scrollbar */

@@ -31,6 +31,8 @@ import {
   attachScrollButtonListeners,
   createSkeletonSection,
 } from "./componentBuilder.js";
+import { login, signup } from "../auth/authService.js";
+import { initAuthUI } from "./authUI.js";
 
 // Helper function to get the main content area element
 const getContentArea = () => document.getElementById("album-sections");
@@ -667,5 +669,181 @@ export function renderDetailPage(type, name) {
   // Add click listener to the back button
   contentArea.querySelector(".back-btn").addEventListener("click", () => {
     window.history.back();
+  });
+}
+
+// ============================================================================
+// AUTHENTICATION RENDERING (Restored)
+// ============================================================================
+
+export function setAuthMode(isAuth) {
+  const appRoot = document.getElementById("app-root");
+  const authRoot = document.getElementById("auth-root");
+
+  if (isAuth) {
+    if (appRoot) appRoot.style.display = "none";
+    if (authRoot) {
+      authRoot.style.display = "block";
+      document.body.classList.add("auth-mode");
+    }
+  } else {
+    // Show App
+    if (appRoot) appRoot.style.display = "block";
+    // Hide Auth
+    if (authRoot) {
+      authRoot.style.display = "none";
+      authRoot.innerHTML = ""; // Cleanup to stop listeners
+      document.body.classList.remove("auth-mode");
+    }
+  }
+}
+
+export function renderLoginPage() {
+  setAuthMode(true);
+  const contentArea = document.getElementById("auth-root");
+  if (!contentArea) return;
+
+  contentArea.innerHTML = `
+    <div class="auth-view">
+      <div class="auth-wrapper">
+        <div class="auth-container fade-in">
+          <img src="images/music.png" alt="VibAura" class="auth-logo">
+          
+          <h1 class="auth-title">Welcome Back</h1>
+          <p class="auth-subtitle">Login to continue your vibe</p>
+          
+          <form id="login-form">
+            <div class="input-group">
+              <label class="form-label">Email</label>
+              <div class="input-wrapper">
+                <img src="images/icons/mail.png" class="input-icon-left" alt="">
+                <input type="email" id="email" class="form-input" placeholder="hello@example.com" required>
+              </div>
+            </div>
+
+            <div class="input-group" style="margin-top: 1rem;">
+              <label class="form-label">Password</label>
+              <div class="input-wrapper">
+                <img src="images/icons/lock.png" class="input-icon-left" alt="">
+                <input type="password" id="password" class="form-input" placeholder="••••••••" required>
+                <button type="button" class="toggle-password" id="toggle-password">
+                  <img src="images/icons/eye.png" class="eye-icon" alt="Show">
+                </button>
+              </div>
+            </div>
+
+            <button type="submit" class="btn-submit">Login</button>
+            
+            <div class="auth-footer">
+              Don't have an account? <a href="#/signup" class="auth-link">Sign Up</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Password Toggle
+  const toggleBtn = document.getElementById("toggle-password");
+  const passwordInput = document.getElementById("password");
+  if (toggleBtn && passwordInput) {
+    toggleBtn.addEventListener("click", () => {
+      const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";
+      passwordInput.setAttribute("type", type);
+      toggleBtn.querySelector("img").src = type === "password"
+        ? "images/icons/eye.png"
+        : "images/icons/eye-off.png";
+    });
+  }
+
+  // Submit Handler
+  const form = document.getElementById("login-form");
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    try {
+      await login(email, password);
+      initAuthUI(); // Force update header to show avatar
+      window.location.hash = "#";
+    } catch (error) {
+      alert("Login failed: " + error.message);
+    }
+  });
+}
+
+export function renderSignupPage() {
+  setAuthMode(true);
+  const contentArea = document.getElementById("auth-root");
+  if (!contentArea) return;
+
+  contentArea.innerHTML = `
+    <div class="auth-view">
+      <div class="auth-wrapper">
+        <div class="auth-container fade-in">
+          <img src="images/music.png" alt="VibAura" class="auth-logo">
+          
+          <h1 class="auth-title">Join VibAura</h1>
+          <p class="auth-subtitle">Create an account to start listening</p>
+          
+          <form id="signup-form">
+            <div class="input-group">
+              <label class="form-label">Email</label>
+              <div class="input-wrapper">
+                <img src="images/icons/mail.png" class="input-icon-left" alt="">
+                <input type="email" id="email" class="form-input" placeholder="hello@example.com" required>
+              </div>
+            </div>
+
+            <div class="input-group" style="margin-top: 1rem;">
+              <label class="form-label">Password</label>
+              <div class="input-wrapper">
+                <img src="images/icons/lock.png" class="input-icon-left" alt="">
+                <input type="password" id="password" class="form-input" placeholder="••••••••" required>
+                <button type="button" class="toggle-password" id="toggle-password">
+                  <img src="images/icons/eye.png" class="eye-icon" alt="Show">
+                </button>
+              </div>
+            </div>
+
+            <button type="submit" class="btn-submit">Sign Up</button>
+            
+            <div class="auth-footer">
+              Already have an account? <a href="#/login" class="auth-link">Login</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Password Toggle
+  const toggleBtn = document.getElementById("toggle-password");
+  const passwordInput = document.getElementById("password");
+  if (toggleBtn && passwordInput) {
+    toggleBtn.addEventListener("click", () => {
+      const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";
+      passwordInput.setAttribute("type", type);
+      toggleBtn.querySelector("img").src = type === "password"
+        ? "images/icons/eye.png"
+        : "images/icons/eye-off.png";
+    });
+  }
+
+  // Submit Handler
+  const form = document.getElementById("signup-form");
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    try {
+      await signup(email, password);
+      alert("Account created! Please login.");
+      window.location.hash = "#/login";
+    } catch (error) {
+      alert("Signup failed: " + error.message);
+    }
   });
 }
