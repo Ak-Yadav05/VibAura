@@ -32,6 +32,11 @@
   display: none;
 }
 
+/* Remove top padding when search page is active (since header is hidden) */
+body.search-page-active .content {
+  padding-top: 0 !important;
+}
+
 /**
  * PAGE VIEWS
  */
