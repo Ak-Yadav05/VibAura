@@ -26,6 +26,7 @@ import {
   renderSignupPage,
   renderForgotPasswordPage,
   renderResetPasswordPage,
+  renderLikedSongsPage,
   setAuthMode
 } from "../ui/pageRenderer.js";
 
@@ -136,6 +137,11 @@ export async function router() {
     setAuthMode(false);
     console.log("[Router] Rendering library page");
     renderLibraryPage();
+  } else if (hash === "#liked-songs") {
+    // --- Liked Songs Page ---
+    setAuthMode(false);
+    console.log("[Router] Rendering liked songs page");
+    renderLikedSongsPage();
   } else if (hash === "#search") {
     // --- Search Page (Mobile) ---
     setAuthMode(false);

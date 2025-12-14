@@ -49,12 +49,18 @@
   display: flex;
   align-items: center;
   gap: 16px;
+  /* Fix width to prevent shifting */
+  width: 30%;
+  max-width: 350px;
+  min-width: 200px;
 }
 
 .song-info {
   display: flex;
   align-items: center;
   gap: 12px;
+  width: 60%;
+  /* Fill wrapper */
 }
 
 .song-album-art {
@@ -67,8 +73,8 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  max-width: 150px;
-  /* Constrain width for marquee logic */
+  /* Removed max-width restriction to use full column width */
+  width: 100%;
 }
 
 .song-title {
@@ -298,7 +304,13 @@ body.dark-theme .play-pause-btn {
 .volume-controls {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
+  /* Align right */
   gap: clamp(8px, 1vw, 12px);
+  /* Match column 1 */
+  width: 30%;
+  max-width: 350px;
+  min-width: 200px;
 }
 
 .volume-slider {

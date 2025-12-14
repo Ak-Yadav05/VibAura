@@ -26,6 +26,18 @@
 @import url("./fullscreen.css");
 @import url("./search.css");
 @import url("./library.css");
+@import url("./bottom-sheet.css");
+@import url("./playlist.css");
+
+
+/* DISABLE CONTEXT MENU ON IMAGES FOR LONG PRESS */
+img,
+.card,
+.card img {
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none !important;
+  user-select: none !important;
+}
 
 /**
  * HIDE DESKTOP-ONLY ELEMENTS ON MOBILE
@@ -34,7 +46,8 @@
 .library,
 .custom-scrollbar,
 #open-fullscreen-btn,
-.scroll-btn {
+.scroll-btn,
+.card-options-btn {
   display: none !important;
 }
 
@@ -73,7 +86,8 @@ body.fullscreen-open .player-container {
  * FIX: reset main container when header is hidden (Search/Library)
  */
 body.library-page-active .main,
-body.search-page-active .main {
+body.search-page-active .main,
+body.playlist-view-active .main {
   top: 0 !important;
   height: calc(100vh - 50px) !important;
   /* Only Nav remains */

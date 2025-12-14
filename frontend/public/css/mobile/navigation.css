@@ -98,3 +98,8 @@ body.dark-theme .nav-link:active img,
 body.dark-theme .nav-link.active img {
   filter: brightness(1) drop-shadow(0 0 4px var(--color-accent));
 }
+
+/* Hide Mobile Nav in Auth Mode */
+body.auth-mode .mobile-nav {
+  display: none !important;
+}

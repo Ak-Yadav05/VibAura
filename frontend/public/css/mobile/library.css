@@ -47,8 +47,10 @@ body.library-page-active .content {
 .library-header {
   display: flex !important;
   align-items: center;
-  margin: 0 !important;
+  justify-content: space-between;
+  margin: 10px;
   margin-bottom: 12px;
+  padding: 0px 10px 0px 5px;
   background: none !important;
   border: none !important;
 }

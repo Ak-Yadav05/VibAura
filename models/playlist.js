@@ -24,6 +24,19 @@ const playlistSchema = new Schema({
     required: false,
   },
 
+  // Owner of the playlist. Null means global/system playlist.
+  owner: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+    required: false,
+    default: null,
+  },
+
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+
   // Category for the playlist (e.g., "General", "Pop", "Focus")
   category: {
     type: String,

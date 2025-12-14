@@ -29,6 +29,18 @@ const userSchema = new mongoose.Schema({
         type: Date,
         default: null,
     },
+    libraryPlaylists: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Playlist",
+        },
+    ],
+    likedSongs: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Song",
+        },
+    ],
 });
 
 module.exports = mongoose.model("User", userSchema);

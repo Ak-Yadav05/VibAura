@@ -29,6 +29,7 @@ import { initScrollController } from "../ui/scrollController.js";
 import { initSplashScreen } from "../ui/splashScreen.js";
 import { initSearch } from "../ui/search.js";
 import { initAuthUI } from "../ui/authUI.js";
+import { LibraryManager } from "../ui/libraryManager.js";
 
 // Import modules that self-initialize or are needed for side-effects (like router)
 import "../core/router.js"; // This import runs the router setup
@@ -44,3 +45,4 @@ initPlayer();
 initScrollController();
 initSearch();
 initAuthUI(); // <-- Initialize Auth UI (Login/Logout buttons)
+LibraryManager.init();

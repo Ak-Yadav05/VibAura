@@ -1,4 +1,5 @@
 import { isAuthenticated, getCurrentUser, logout } from '../auth/authService.js';
+import { LibraryManager } from './libraryManager.js';
 
 export function initAuthUI() {
     updateHeader();
@@ -18,6 +19,8 @@ function updateHeader() {
             profile.addEventListener('click', () => {
                 if (confirm("Are you sure you want to logout?")) {
                     logout();
+                    initAuthUI(); // Update Header
+                    LibraryManager.renderLibrary(); // Reset Library
                 }
             });
         });

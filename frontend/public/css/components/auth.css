@@ -27,8 +27,19 @@ body.auth-mode {
     background: linear-gradient(135deg, var(--color-gradient-start) 0%, var(--color-gradient-end) 100%);
 
     box-shadow: none !important;
+    box-shadow: none !important;
     overflow-x: hidden !important;
     overscroll-behavior: none;
+}
+
+/* Hide Mobile Nav in Auth Mode */
+body.auth-mode .mobile-nav {
+    display: none !important;
+}
+
+/* Hide Player Container Global (Desktop & Mobile) in Auth Mode */
+body.auth-mode .player-container {
+    display: none !important;
 }
 
 /* Main Full-Screen Layout */

@@ -18,7 +18,13 @@
   height: var(--player-height-mobile);
   z-index: var(--z-player-container);
   background: transparent;
+  background: transparent;
   border: none;
+}
+
+/* Hide Player in Auth Mode */
+body.auth-mode .player-container {
+  display: none !important;
 }
 
 /**
@@ -79,7 +85,7 @@
   text-overflow: ellipsis;
 }
 
-.artist-wrapper{
+.artist-wrapper {
   margin-top: -5px;
 }
 
@@ -140,6 +146,15 @@
 .player-btn:active img {
   transform: scale(0.9);
   filter: brightness(1);
+}
+
+/* Ensure Heart Icon (Favorite) keeps its original colors */
+.player-btn.favorite-btn img,
+.player-btn#favorite-btn img,
+.player-btn#fullscreen-favorite-btn img,
+.player-btn.active#favorite-btn img,
+.player-btn.active#fullscreen-favorite-btn img {
+  filter: none !important;
 }
 
 body.dark-theme .player-btn img {

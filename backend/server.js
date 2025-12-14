@@ -52,14 +52,18 @@ app.get("/api/debug/songs-count", async (req, res) => {
 
 // Mount search routes
 const authRoutes = require("./routes/auth");
+const libraryRoutes = require("./routes/library");
+const playlistRoutes = require("./routes/playlist");
+
 app.use("/api/auth", authRoutes); // Login/Signup
 app.use("/api/search", searchRoutes);
+app.use("/api/library", libraryRoutes);
+app.use("/api/playlists", playlistRoutes);
 
 // --- Songs ---
 app.get("/api/songs/featured", async (req, res) => {
   try {
     const featuredSongs = await Song.find({ isFeatured: true })
-      .populate({ path: "artist", model: "Artist" })
       .populate({ path: "artists", model: "Artist" })
       .lean();
     res.json(featuredSongs);
@@ -72,7 +76,6 @@ app.get("/api/songs/featured", async (req, res) => {
 app.get("/api/songs", async (req, res) => {
   try {
     const songs = await Song.find()
-      .populate({ path: "artist", model: "Artist" })
       .populate({ path: "artists", model: "Artist" })
       .lean();
     res.json(songs);
@@ -85,7 +88,6 @@ app.get("/api/songs", async (req, res) => {
 app.get("/api/songs/:id", async (req, res) => {
   try {
     const song = await Song.findById(req.params.id)
-      .populate({ path: "artist", model: "Artist" })
       .populate({ path: "artists", model: "Artist" })
       .lean();
     if (!song) return res.status(404).json({ message: "Song not found" });

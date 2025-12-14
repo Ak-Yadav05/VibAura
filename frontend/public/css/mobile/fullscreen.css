@@ -202,6 +202,7 @@ body.fullscreen-open .fullscreen-player {
   height: 28px;
   /* filter: brightness(0.4);
   transition: filter 0.2s ease; */
+  filter: none !important;
 }
 
 #fullscreen-favorite-btn:active img {

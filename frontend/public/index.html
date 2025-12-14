@@ -11,13 +11,27 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&display=swap"
     rel="stylesheet" />
+  <link rel="stylesheet" href="css/base/variables.css" />
   <link rel="stylesheet" href="css/base/skeleton.css" />
   <link rel="stylesheet" href="css/components/search.css" />
   <link rel="stylesheet" href="css/components/auth.css" />
+  <link rel="stylesheet" href="css/components/icons.css" />
+
+  <!-- Desktop Styles -->
   <link rel="stylesheet" href="css/desktop/index.css" media="(min-width: 769px)" />
+  <link rel="stylesheet" href="css/desktop/modals.css" media="(min-width: 769px)" />
+
+  <!-- Mobile Styles -->
   <link rel="stylesheet" href="css/mobile/index.css" media="(max-width: 768px)" />
+  <link rel="stylesheet" href="css/mobile/bottom-sheet.css" media="(max-width: 768px)" />
+  <link rel="stylesheet" href="css/mobile/modals.css" media="(max-width: 768px)" />
 
   <style>
+    /* Dynamic Playlist View State */
+    body.playlist-view-active .mobile-header {
+      display: none !important;
+    }
+
     .splash-screen {
       position: fixed;
       inset: 0;
@@ -162,54 +176,22 @@
       <aside class="library" id="libraryMenu">
         <div class="library-header">
           <h2 class="library-title">Your Library</h2>
+          <button class="library-add-btn" id="create-playlist-btn" title="Create Playlist">
+            <img src="images/icons/plus.png" alt="Create" class="icon-adaptive" />
+          </button>
         </div>
 
         <ul class="library-list">
-          <li class="library-item">
-            <img src="https://placehold.co/64x64/8B5CF6/FFFFFF?text=♥" alt="Liked Songs" class="library-item-img" />
-            <div class="library-item-info">
-              <span class="library-item-title">Liked Songs</span>
-              <span class="library-item-subtitle">Playlist • 20 songs</span>
-            </div>
-          </li>
-
-          <li class="library-item">
-            <img src="https://placehold.co/64x64/EAB308/000000?text=P1" alt="My Playlist #1" class="library-item-img" />
-            <div class="library-item-info">
-              <span class="library-item-title">My Playlist #1</span>
-              <span class="library-item-subtitle">Playlist • Artist</span>
-            </div>
-          </li>
-
-          <li class="library-item">
-            <img src="https://placehold.co/64x64/22C55E/FFFFFF?text=WM" alt="Workout Mix" class="library-item-img" />
-            <div class="library-item-info">
-              <span class="library-item-title">Workout Mix</span>
-              <span class="library-item-subtitle">Playlist • Artist</span>
-            </div>
-          </li>
-
-          <li class="library-item">
-            <img src="https://placehold.co/64x64/3B82F6/FFFFFF?text=CV" alt="Chill Vibes" class="library-item-img" />
-            <div class="library-item-info">
-              <span class="library-item-title">Chill Vibes</span>
-              <span class="library-item-subtitle">Playlist • Artist</span>
-            </div>
-          </li>
-
-          <li class="library-item">
-            <img src="https://placehold.co/64x64/EC4899/FFFFFF?text=RT" alt="Road Trip" class="library-item-img" />
-            <div class="library-item-info">
-              <span class="library-item-title">Road Trip</span>
-              <span class="library-item-subtitle">Playlist • Artist</span>
-            </div>
-          </li>
+          <!-- Dynamic Content -->
         </ul>
       </aside>
 
       <section class="content">
         <div id="album-sections"></div>
       </section>
+
+
+
       <div class="custom-scrollbar">
         <div class="custom-scrollbar-thumb"></div>
       </div>
@@ -295,6 +277,33 @@
   </footer>
 
   <audio id="audio-player"></audio>
+
+  <!-- MODALS (Moved to Body Scope for Z-Index Safety) -->
+  <div class="modal-overlay" id="create-playlist-modal" style="display: none;">
+    <div class="modal-content">
+      <h2 class="modal-title">Create Playlist</h2>
+      <form id="create-playlist-form">
+        <input type="text" id="playlist-name-input" class="modal-input" placeholder="Playlist Name" required
+          maxlength="50" autocomplete="off" />
+        <div class="modal-actions">
+          <button type="button" class="modal-btn secondary" id="close-create-playlist">Cancel</button>
+          <button type="submit" class="modal-btn primary">Create</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="add-to-playlist-modal" style="display: none;">
+    <div class="modal-content">
+      <h2 class="modal-title">Add to Playlist</h2>
+      <ul class="playlist-selection-list" id="add-to-playlist-list">
+        <!-- Populated dynamically -->
+      </ul>
+      <div class="modal-actions">
+        <button type="button" class="modal-btn secondary" id="close-add-to-playlist">Close</button>
+      </div>
+    </div>
+  </div>
 
   <div class="fullscreen-player" id="fullscreen-player">
     <div class="fullscreen-player-header">

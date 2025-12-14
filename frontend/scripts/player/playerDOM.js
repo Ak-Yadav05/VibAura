@@ -60,6 +60,7 @@ export const dom = {
   shuffleBtn: document.getElementById("shuffle-btn"),
   repeatBtn: document.getElementById("repeat-btn"),
   volumeSlider: document.getElementById("volume-slider"),
+  likeBtn: document.getElementById("favorite-btn"),
 
   // ========================================================================
   // FULLSCREEN PLAYER ELEMENTS
@@ -90,4 +91,5 @@ export const dom = {
   fsNextBtn: document.getElementById("fullscreen-next-btn"),
   fsShuffleBtn: document.getElementById("fullscreen-shuffle-btn"),
   fsRepeatBtn: document.getElementById("fullscreen-repeat-btn"),
+  fsLikeBtn: document.getElementById("fullscreen-favorite-btn"),
 };

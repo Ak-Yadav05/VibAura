@@ -22,6 +22,7 @@
 import { dom } from "./playerDOM.js";
 import { state } from "./playerState.js";
 import { formatTime } from "../utils/utils.js";
+import { PlaylistService } from "../services/playlistService.js";
 
 /**
  * Loads a song object into the audio element and updates all UI displays.
@@ -148,6 +149,13 @@ function loadSong(song) {
 
   // --- Load audio source ---
   dom.audio.src = song.fileUrl;
+
+  // Ensure we know likeds songs (async, might update UI later for first song)
+  ensureLikedSongsLoaded().then(() => {
+    updateLikeState(song._id);
+  });
+  // Immediate update if we already have data
+  if (isLikedSongsFetched) updateLikeState(song._id);
 }
 
 /**
@@ -308,6 +316,86 @@ function updateProgress() {
  * @param {HTMLInputElement} inputElement - The progress bar <input> element (either mini or fullscreen)
  * @returns {void}
  */
+// ============================================================================
+// LIKE / FAVORITE FUNCTIONALITY
+// ============================================================================
+
+let likedSongIds = new Set();
+let isLikedSongsFetched = false;
+
+// Pre-fetch liked songs on startup (or lazy load)
+async function ensureLikedSongsLoaded() {
+  if (isLikedSongsFetched) return;
+  try {
+    const data = await PlaylistService.getUserLibrary();
+    // data.likedSongs is array of objects, we need IDs
+    const ids = (data.likedSongs || []).map(s => s._id);
+    likedSongIds = new Set(ids);
+    isLikedSongsFetched = true;
+  } catch (err) {
+    console.warn("Failed to fetch liked songs for player:", err);
+  }
+}
+
+/**
+ * Updates the visual state of the like buttons based on current song.
+ */
+function updateLikeState(songId) {
+  const isLiked = likedSongIds.has(songId);
+
+  const updateBtn = (btn) => {
+    if (!btn) return;
+    const img = btn.querySelector("img");
+    if (isLiked) {
+      // Use filled heart (heart.png as requested)
+      if (img) img.src = "images/media controls/heart.png";
+      btn.classList.add("active"); // For CSS animations
+    } else {
+      if (img) img.src = "images/media controls/favourite.png";
+      btn.classList.remove("active");
+    }
+  };
+
+  updateBtn(dom.likeBtn);
+  updateBtn(dom.fsLikeBtn);
+}
+
+/**
+ * Toggles the like status of the CURRENTLY PLAYING song.
+ */
+async function toggleLike(e) {
+  if (e) {
+    e.stopPropagation();
+    e.stopImmediatePropagation(); // Ensure it doesn't bubble to songInfoWrapper
+  }
+
+  const song = state.getCurrentSong();
+  if (!song || !song._id) return;
+
+  const isLiked = likedSongIds.has(song._id);
+
+  // Optimistic UI update
+  if (isLiked) likedSongIds.delete(song._id);
+  else likedSongIds.add(song._id);
+  updateLikeState(song._id);
+
+  try {
+    if (isLiked) {
+      await PlaylistService.removeFromLikedSongs(song._id);
+    } else {
+      await PlaylistService.addToLikedSongs(song._id);
+    }
+  } catch (err) {
+    console.error("Like toggle failed", err);
+    // Revert
+    if (isLiked) likedSongIds.add(song._id);
+    else likedSongIds.delete(song._id);
+    updateLikeState(song._id);
+  }
+}
+
+// ----------------------------------------------------------------------------
+
 function setProgressFromInput(inputElement) {
   const duration = dom.audio.duration;
   if (duration) {
@@ -448,6 +536,9 @@ export function playSongFromPlaylist(newPlaylist, index) {
   playSong();
 }
 
+// Expose to window for inline onclick handlers
+window.playSongFromPlaylist = playSongFromPlaylist;
+
 /**
  * PUBLIC: Initializes all player event listeners.
  * Called once on app startup from app.js.
@@ -459,7 +550,12 @@ export function initPlayer() {
   // --- Fullscreen player open/close listeners ---
   dom.openFullscreenBtn.addEventListener("click", openFullscreenPlayer);
   // Also open fullscreen if user clicks the song info area on mobile
-  dom.songInfoWrapper.addEventListener("click", openFullscreenPlayer);
+  // CONDITIONAL CHANGE: Only open if on mobile (screen width <= 768px)
+  dom.songInfoWrapper.addEventListener("click", () => {
+    if (window.innerWidth <= 768) {
+      openFullscreenPlayer();
+    }
+  });
   dom.closeFullscreenBtn.addEventListener("click", closeFullscreenPlayer);
 
   // --- Mini-player controls ---
@@ -518,4 +614,8 @@ export function initPlayer() {
   // Also catch 'change' as end of drag for accessibility/keyboard
   dom.progressBar.addEventListener("change", endDrag);
   dom.fsProgressBar.addEventListener("change", endDrag);
+
+  // --- Like / Favorite ---
+  if (dom.likeBtn) dom.likeBtn.addEventListener("click", toggleLike);
+  if (dom.fsLikeBtn) dom.fsLikeBtn.addEventListener("click", toggleLike);
 }

@@ -32,9 +32,34 @@
 .library-header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   padding: 20px 16px 8px 16px;
   flex-shrink: 0;
-  /* border-bottom: 1px solid rgba(0, 0, 0, 0.05); */
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.library-add-btn {
+  background: none;
+  border: none;
+  outline: none;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  border-radius: 50%;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.library-add-btn:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  transform: scale(1.05);
+}
+
+body.dark-theme .library-add-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 body.dark-theme .library-header {
@@ -194,4 +219,118 @@ body.dark-theme .library-item:hover .library-item-img {
   overflow: hidden;
   text-overflow: ellipsis;
   font-weight: 500;
+}
+
+/**
+ * CONTEXT MENU (More Options)
+ */
+.context-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: var(--color-background-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  min-width: 180px;
+  padding: 4px 0;
+  display: none;
+  /* Hidden by default */
+  animation: fadeIn 0.1s ease;
+}
+
+.context-menu.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.context-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-size: 0.9rem;
+  color: var(--color-text-primary);
+}
+
+.context-menu-item:hover {
+  background-color: var(--color-background-muted);
+}
+
+.context-menu-item.danger {
+  color: #ef4444;
+  /* Red color for delete */
+}
+
+.context-menu-item.danger:hover {
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+.context-menu-icon {
+  width: 16px;
+  height: 16px;
+  opacity: 0.7;
+}
+
+body.dark-theme .context-menu {
+  background-color: #2d2d2d;
+  /* Slightly lighter than pure black */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/**
+ * MORE BUTTON (Vertical)
+ */
+.library-more-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  opacity: 0;
+  /* Hidden by default on desktop until hover */
+  transition: opacity 0.2s, background-color 0.2s;
+  /* Rotate vertical */
+  transform: rotate(90deg);
+}
+
+.library-item:hover .library-more-btn,
+.library-item.menu-active .library-more-btn {
+  opacity: 1;
+}
+
+.library-more-btn:hover,
+.library-item.menu-active .library-more-btn {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.library-item.menu-active {
+  background-color: var(--color-background-muted);
+  border-color: var(--color-accent-light);
+  z-index: 20;
+  /* Ensure on top */
+}
+
+body.dark-theme .library-more-btn:hover,
+body.dark-theme .library-item.menu-active .library-more-btn {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-theme .library-item.menu-active {
+  background-color: rgba(255, 255, 255, 0.08);
 }
