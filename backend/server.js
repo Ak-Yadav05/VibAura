@@ -324,7 +324,8 @@ async function startServer() {
     await mongoose.connect(mongoUri, {
       serverSelectionTimeoutMS: 10000,
       socketTimeoutMS: 45000,
-      retryWrites: true,
+      retryWrites: false,
+      writeConcern: { w: 1 },
     });
     info("Connected to MongoDB");
 

@@ -24,6 +24,8 @@ import {
   renderSearchPage,
   renderLoginPage,
   renderSignupPage,
+  renderForgotPasswordPage,
+  renderResetPasswordPage,
   setAuthMode
 } from "../ui/pageRenderer.js";
 
@@ -88,19 +90,25 @@ export async function router() {
   if (mobileHeader && contentArea) {
     console.log(`[Router] Mobile check - innerWidth: ${window.innerWidth}, hash: ${hash}`);
     if (window.innerWidth <= 768) {
-      // Mobile view
-      if (hash === "#library") {
-        console.log("[Router] Hiding mobile header for library page");
+      // Mobile view: Hide header for Library AND Search pages
+      if (hash === "#library" || hash === "#search") {
+        console.log(`[Router] Hiding mobile header for ${hash}`);
         mobileHeader.style.display = "none";
         mobileHeader.style.visibility = "hidden";
         contentArea.style.paddingTop = "20px";
-        document.body.classList.add("library-page-active");
+
+        // Toggle body classes for CSS targeting
+        if (hash === "#library") document.body.classList.add("library-page-active");
+        if (hash === "#search") document.body.classList.add("search-page-active");
       } else {
         console.log("[Router] Showing mobile header");
         mobileHeader.style.display = "flex";
         mobileHeader.style.visibility = "visible";
         contentArea.style.paddingTop = "75px";
+
+        // Clean up classes
         document.body.classList.remove("library-page-active");
+        document.body.classList.remove("search-page-active");
       }
     } else {
       // Reset to default styles for desktop view
@@ -153,6 +161,14 @@ export async function router() {
     // --- Signup Page ---
     console.log("[Router] Rendering signup page");
     renderSignupPage();
+  } else if (hash === "#/forgot-password") {
+    // --- Forgot Password Page ---
+    console.log("[Router] Rendering forgot password page");
+    renderForgotPasswordPage();
+  } else if (hash.startsWith("#/reset-password")) {
+    // --- Reset Password Page ---
+    console.log("[Router] Rendering reset password page");
+    renderResetPasswordPage();
   } else {
     // --- Home Page (Default) ---
     // Default to home page for root hash (#), empty hash, or unrecognized routes

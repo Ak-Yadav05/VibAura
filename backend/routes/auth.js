@@ -4,6 +4,8 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../../models/user");
 const { authenticateToken } = require("../middleware/authMiddleware");
+const crypto = require("crypto");
+const sendEmail = require("../utils/sendEmail");
 
 // Signup
 router.post("/signup", async (req, res) => {
@@ -84,6 +86,118 @@ router.get("/me", authenticateToken, async (req, res) => {
         res.json(user);
     } catch (err) {
         console.error("Me error:", err);
+        res.status(500).json({ message: "Internal server error" });
+    }
+});
+
+// Forgot Password
+router.post("/forgot-password", async (req, res) => {
+    try {
+        const { email } = req.body;
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            // ⚠️ Security: Always return success to prevent email enumeration
+            return res.status(200).json({ message: "If that email exists, a reset link has been sent." });
+        }
+
+        // Generate token
+        const resetToken = crypto.randomBytes(20).toString("hex");
+
+        // Hash token and set to resetPasswordToken field
+        user.resetPasswordToken = crypto
+            .createHash("sha256")
+            .update(resetToken)
+            .digest("hex");
+
+        // Set expire (15 minutes)
+        user.resetPasswordExpires = Date.now() + 15 * 60 * 1000;
+
+        await user.save();
+
+        // Create reset url (SPA hash route)
+        // Create reset url (SPA hash route)
+        // const resetUrl = `http://localhost:3000/#/reset-password?token=${resetToken}`;
+        const resetUrl = `https://cathryn-portionless-doreen.ngrok-free.dev/#/reset-password?token=${resetToken}`;
+
+        const message = `You are receiving this email because you (or someone else) has requested the reset of a password. Please make a PUT (or POST via UI) request to: \n\n ${resetUrl}`;
+
+        // Development logging
+        console.log("====================================");
+        console.log("PASSWORD RESET LINK:", resetUrl);
+        console.log("====================================");
+        // Write to file for easier access in development
+        try {
+            require("fs").writeFileSync("token.txt", resetUrl);
+        } catch (err) {
+            console.error("Failed to write token.txt:", err);
+        }
+
+        try {
+            await sendEmail({
+                email: user.email,
+                subject: "Password Reset Token",
+                message,
+            });
+
+            res.status(200).json({ message: "If that email exists, a reset link has been sent." });
+        } catch (err) {
+            user.resetPasswordToken = undefined;
+            user.resetPasswordExpires = undefined;
+            await user.save();
+            console.error("Email send error:", err);
+            return res.status(500).json({ message: "Email could not be sent" });
+        }
+    } catch (err) {
+        console.error("Forgot Password Error:", err);
+        res.status(500).json({ message: "Internal server error" });
+    }
+});
+
+// Reset Password
+router.post("/reset-password", async (req, res) => {
+    try {
+        const { token, newPassword } = req.body;
+
+        if (!token || !newPassword) {
+            return res.status(400).json({ message: "Token and new password are required" });
+        }
+
+        // Hash token to compare with DB
+        const resetPasswordToken = crypto
+            .createHash("sha256")
+            .update(token)
+            .digest("hex");
+
+        const user = await User.findOne({
+            resetPasswordToken,
+            resetPasswordExpires: { $gt: Date.now() },
+        });
+
+
+        if (!user) {
+            return res.status(400).json({ message: "Invalid or expired token" });
+        }
+
+        // Check if new password is same as old password
+        const isSamePassword = await bcrypt.compare(newPassword, user.passwordHash);
+        if (isSamePassword) {
+            return res.status(400).json({ message: "New password cannot be the same as the old password" });
+        }
+
+        // Set new password
+        const salt = await bcrypt.genSalt(10);
+        user.passwordHash = await bcrypt.hash(newPassword, salt);
+
+        // Clear reset fields
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpires = undefined;
+
+        await user.save();
+
+        res.status(200).json({ message: "Password updated successfully" });
+    } catch (err) {
+        console.error("Reset Password Error:", err);
         res.status(500).json({ message: "Internal server error" });
     }
 });

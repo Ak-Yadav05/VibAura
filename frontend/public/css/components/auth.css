@@ -331,5 +331,7 @@ body.dark-theme .toggle-password {
 @media (max-width: 480px) {
     body.dark-theme .auth-container {
         background: transparent;
+        border: none;
+        box-shadow: none;
     }
 }

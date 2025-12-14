@@ -732,6 +732,10 @@ export function renderLoginPage() {
               </div>
             </div>
 
+            <div style="text-align: right; margin-top: 0.5rem;">
+              <a href="#/forgot-password" class="auth-link" style="font-size: 0.9rem;">Forgot Password?</a>
+            </div>
+
             <button type="submit" class="btn-submit">Login</button>
             
             <div class="auth-footer">
@@ -840,10 +844,175 @@ export function renderSignupPage() {
 
     try {
       await signup(email, password);
+      // Backend returns 201 Created, no token. Redirect to login.
       alert("Account created! Please login.");
       window.location.hash = "#/login";
     } catch (error) {
       alert("Signup failed: " + error.message);
+    }
+  });
+}
+
+export function renderForgotPasswordPage() {
+  setAuthMode(true);
+  const contentArea = document.getElementById("auth-root");
+  if (!contentArea) return;
+
+  contentArea.innerHTML = `
+    <div class="auth-view">
+      <div class="auth-wrapper">
+        <div class="auth-container fade-in">
+          <img src="images/music.png" alt="VibAura" class="auth-logo">
+          
+          <h1 class="auth-title">Forgot Password</h1>
+          <p class="auth-subtitle">Enter your email to receive a reset link</p>
+          
+          <form id="forgot-form">
+            <div class="input-group">
+              <label class="form-label">Email</label>
+              <div class="input-wrapper">
+                <img src="images/icons/mail.png" class="input-icon-left" alt="">
+                <input type="email" id="email" class="form-input" placeholder="hello@example.com" required>
+              </div>
+            </div>
+
+            <button type="submit" class="btn-submit">Send Reset Link</button>
+            
+            <div class="auth-footer">
+              <a href="#/login" class="auth-link">Back to Login</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  `;
+
+  const form = document.getElementById("forgot-form");
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = document.getElementById("email").value;
+    const btn = form.querySelector(".btn-submit");
+    const originalText = btn.textContent;
+
+    btn.disabled = true;
+    btn.textContent = "Sending...";
+
+    try {
+      const res = await fetch("/api/auth/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      alert(data.message); // Always success message
+    } catch (error) {
+      alert("Something went wrong. Please try again.");
+      console.error(error);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = originalText;
+    }
+  });
+}
+
+export function renderResetPasswordPage() {
+  setAuthMode(true);
+  const contentArea = document.getElementById("auth-root");
+  if (!contentArea) return;
+
+  // Parse token from URL query params (hash routing compatible)
+  const hash = window.location.hash; // #/reset-password?token=XYZ
+  // We need to handle cases where token might be a query param on the hash
+  // e.g. #/reset-password?token=...
+  const parts = hash.split('?');
+  const params = new URLSearchParams(parts[1] || "");
+  const token = params.get("token");
+
+  if (!token) {
+    contentArea.innerHTML = `
+      <div class="auth-view"><div class="auth-wrapper"><div class="auth-container">
+        <h1 class="auth-title">Invalid Link</h1>
+        <p class="auth-subtitle">Missing reset token.</p>
+        <a href="#/login" class="auth-link">Back to Login</a>
+      </div></div></div>`;
+    return;
+  }
+
+  contentArea.innerHTML = `
+    <div class="auth-view">
+      <div class="auth-wrapper">
+        <div class="auth-container fade-in">
+          <img src="images/music.png" alt="VibAura" class="auth-logo">
+          
+          <h1 class="auth-title">Reset Password</h1>
+          <p class="auth-subtitle">Enter your new password below</p>
+          
+          <form id="reset-form">
+            <div class="input-group">
+              <label class="form-label">New Password</label>
+              <div class="input-wrapper">
+                <img src="images/icons/lock.png" class="input-icon-left" alt="">
+                <input type="password" id="password" class="form-input" placeholder="••••••••" required>
+                <button type="button" class="toggle-password" id="toggle-password">
+                  <img src="images/icons/eye.png" class="eye-icon" alt="Show">
+                </button>
+              </div>
+            </div>
+
+            <button type="submit" class="btn-submit">Update Password</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Password Toggle
+  const toggleBtn = document.getElementById("toggle-password");
+  const passwordInput = document.getElementById("password");
+  if (toggleBtn && passwordInput) {
+    toggleBtn.addEventListener("click", () => {
+      const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";
+      passwordInput.setAttribute("type", type);
+      toggleBtn.querySelector("img").src = type === "password"
+        ? "images/icons/eye.png"
+        : "images/icons/eye-off.png";
+    });
+  }
+
+  const form = document.getElementById("reset-form");
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const newPassword = document.getElementById("password").value;
+    const btn = form.querySelector(".btn-submit");
+
+    btn.disabled = true;
+    btn.textContent = "Updating...";
+
+    try {
+      const res = await fetch("/api/auth/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token, newPassword }),
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        // Show success message and hide form
+        const container = document.querySelector(".auth-container");
+        container.innerHTML = `
+            <h2>Password Updated!</h2>
+            <p>Your password has been successfully reset.</p>
+            <p style="margin-top: 1rem; color: #aaa;">You can now close this tab and log in with your new password on your original device.</p>
+        `;
+      } else {
+        alert(data.message || "Update failed");
+      }
+    } catch (error) {
+      alert("Error updating password.");
+      console.error(error);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "Update Password";
     }
   });
 }

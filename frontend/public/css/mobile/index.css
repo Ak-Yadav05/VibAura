@@ -68,3 +68,13 @@ body.fullscreen-open .player-container {
   /* Contain the scrollable area */
   z-index: 1 !important;
 }
+
+/* 
+ * FIX: reset main container when header is hidden (Search/Library)
+ */
+body.library-page-active .main,
+body.search-page-active .main {
+  top: 0 !important;
+  height: calc(100vh - 50px) !important;
+  /* Only Nav remains */
+}
