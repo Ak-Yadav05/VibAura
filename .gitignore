@@ -42,3 +42,6 @@ SpotSync/.env
 !.env.example
 !SpotSync/.env.example
 !SpotSync/requirements.txt
+
+# password reset token
+token.txt
