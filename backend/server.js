@@ -123,7 +123,10 @@ app.get("/api/artists/:id", async (req, res) => {
   try {
     const artist = await Artist.findById(req.params.id).lean();
     if (!artist) return res.status(404).json({ message: "Artist not found" });
-    const songs = await Song.find({ artists: artist._id }).lean();
+    // Populate artists field to match playlist API behavior
+    const songs = await Song.find({ artists: artist._id })
+      .populate({ path: 'artists', model: 'Artist' })
+      .lean();
     res.json({ artist, songs });
   } catch (err) {
     error("Error fetching artist details:", err);

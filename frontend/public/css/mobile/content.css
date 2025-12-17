@@ -40,6 +40,16 @@ body.search-page-active .content {
   padding-top: 0 !important;
 }
 
+/* Remove top padding when artist page is active (full-screen hero) */
+body.artist-page-active .content {
+  padding-top: 0 !important;
+}
+
+/* Fix .main height for artist pages (header is hidden, use full viewport) */
+body.artist-page-active .main {
+  height: 100vh !important;
+}
+
 /**
  * PAGE VIEWS
  */

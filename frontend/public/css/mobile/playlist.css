@@ -309,16 +309,30 @@ body.dark-theme .sticky-back-btn img {
 
 .card-options-btn {
     display: flex !important;
+    position: relative !important;
+    /* Override absolute positioning from icons.css */
+    top: auto !important;
+    right: auto !important;
+    align-items: center;
+    justify-content: center;
     background: transparent;
     border: none;
     padding: 8px;
+    cursor: pointer;
     opacity: 0.6;
+    transition: opacity 0.2s;
+    z-index: auto !important;
+}
+
+.card-options-btn:active {
+    opacity: 1;
 }
 
 .card-options-btn img {
-    width: 16px;
-    height: 16px;
-    /* Adaptive via JS or global CSS */
+    width: 20px;
+    height: 20px;
+    transform: rotate(90deg);
+    filter: var(--icon-filter);
 }
 
 /* Ensure icons adapt to theme */

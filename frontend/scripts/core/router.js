@@ -91,16 +91,19 @@ export async function router() {
   if (mobileHeader && contentArea) {
     console.log(`[Router] Mobile check - innerWidth: ${window.innerWidth}, hash: ${hash}`);
     if (window.innerWidth <= 768) {
-      // Mobile view: Hide header for Library AND Search pages
-      if (hash === "#library" || hash === "#search") {
+      // Mobile view: Hide header for Library, Search, AND Artist pages
+      const shouldHideHeader = hash === "#library" || hash === "#search" || hash.startsWith("#/artist/");
+
+      if (shouldHideHeader) {
         console.log(`[Router] Hiding mobile header for ${hash}`);
         mobileHeader.style.display = "none";
         mobileHeader.style.visibility = "hidden";
-        contentArea.style.paddingTop = "20px";
+        contentArea.style.paddingTop = hash.startsWith("#/artist/") ? "0" : "20px";
 
         // Toggle body classes for CSS targeting
         if (hash === "#library") document.body.classList.add("library-page-active");
         if (hash === "#search") document.body.classList.add("search-page-active");
+        if (hash.startsWith("#/artist/")) document.body.classList.add("artist-page-active");
       } else {
         console.log("[Router] Showing mobile header");
         mobileHeader.style.display = "flex";
@@ -110,6 +113,7 @@ export async function router() {
         // Clean up classes
         document.body.classList.remove("library-page-active");
         document.body.classList.remove("search-page-active");
+        document.body.classList.remove("artist-page-active");
       }
     } else {
       // Reset to default styles for desktop view

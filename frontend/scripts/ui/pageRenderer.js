@@ -149,8 +149,14 @@ export async function renderArtistPage(artistId) {
     return;
   }
 
-  // Reset mobile view state
+  // Reset mobile view state and HIDE mobile header for fullscreen hero
   document.body.classList.remove("playlist-view-active");
+
+  // Hide mobile header for immersive artist hero experience
+  const mobileHeader = document.querySelector('.mobile-header');
+  if (mobileHeader) {
+    mobileHeader.style.display = 'none';
+  }
 
   // Remove padding for full-width design
   const scrollContainer = contentArea.parentElement;
@@ -172,6 +178,184 @@ export async function renderArtistPage(artistId) {
     const artistImg = artist.artworkUrl || artist.imageUrl || "https://placehold.co/300x300?text=Artist";
     const songCount = songs.length;
 
+    // DEBUG: Check what API returns
+    console.log('[Artist Page] Total songs:', songCount);
+    if (songs.length > 0) {
+      console.log('[Artist Page] First song:', songs[0].title);
+      console.log('[Artist Page] First song.artists:', songs[0].artists);
+    }
+
+    // Ensure each song has proper artist information for player
+    const normalizedSongs = songs.map(song => {
+      // Extract artist names just like the playlist page does
+      let artistName = '';
+
+      if (song.artists && song.artists.length > 0) {
+        // Check if artists are populated objects or just IDs (strings)
+        const firstArtist = song.artists[0];
+
+        if (typeof firstArtist === 'string') {
+          // Artists are just IDs, not populated - use main artist
+          artistName = artist.name;
+        } else {
+          // Artists are objects, get valid names
+          const validNames = song.artists
+            .map(a => a.name)
+            .filter(name => name && name.trim() !== '');
+
+          // Join all valid names
+          artistName = validNames.length > 0 ? validNames.join(", ") : artist.name;
+        }
+      } else {
+        // No artists array, fallback to main artist
+        artistName = artist.name;
+      }
+
+      return {
+        ...song,
+        artistName: artistName
+      };
+    });
+
+    // Check if mobile viewport
+    const isMobile = window.innerWidth <= 768;
+
+    if (isMobile) {
+      // Render Mobile View (Playlist Style)
+      let songsHTML = "";
+      if (normalizedSongs.length > 0) {
+        songsHTML = normalizedSongs.map((song, index) => {
+          // Use the artistName we set during normalization
+          const artistNames = song.artistName || artist.name;
+
+          return `
+          <div class="mobile-artist-song-item" data-index="${index}" data-song-id="${song._id}">
+            <img src="${song.artworkUrl || 'images/music.png'}" alt="${song.title}" class="mobile-artist-song-artwork">
+            <div class="mobile-artist-song-info">
+              <div class="mobile-artist-song-title">${song.title}</div>
+              <div class="mobile-artist-song-artists">${artistNames}</div>
+            </div>
+            <button class="mobile-artist-song-more" data-song-index="${index}">
+              <img src="images/icons/more.png" alt="More options">
+            </button>
+          </div>
+        `;
+        }).join('');
+      } else {
+        songsHTML = `
+          <div class="mobile-artist-empty">
+            <p>No songs available for this artist.</p>
+          </div>
+        `;
+      }
+
+      contentArea.innerHTML = `
+        <!-- Simple Sticky Header (outside page-view) -->
+        <div class="mobile-artist-sticky-header" id="mobile-artist-sticky-header">
+          <button class="sticky-back-btn" onclick="window.history.back()">
+            <img src="images/icons/back.png" alt="Back" class="icon-adaptive">
+          </button>
+        </div>
+
+        <div class="page-view mobile-artist-page" style="background: var(--color-background-surface);">
+          <!-- Hero Section -->
+          <div class="mobile-artist-hero">
+            <img src="${artistImg}" alt="${artist.name}" class="mobile-artist-hero-image">
+            <div class="mobile-artist-hero-overlay"></div>
+            <button class="mobile-artist-back-btn" onclick="window.history.back()">
+              <img src="images/icons/back.png" alt="Back">
+            </button>
+            <div class="mobile-artist-hero-info">
+              <span class="artist-type-label">ARTIST</span>
+              <h1 class="mobile-artist-name">${artist.name}</h1>
+              <div class="artist-stats">${songCount} songs</div>
+            </div>
+          </div>
+
+          <!-- Content Section -->
+          <div class="mobile-artist-content">
+            <h2 class="mobile-artist-section-title">Songs</h2>
+            <div class="mobile-artist-song-list">
+              ${songsHTML}
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Mobile Event Listeners
+
+      // Sticky header on scroll
+      const stickyHeader = contentArea.querySelector('#mobile-artist-sticky-header');
+      const parentScroll = contentArea.parentElement;
+      if (stickyHeader && parentScroll) {
+        const onScroll = () => {
+          if (parentScroll.scrollTop > 280) {
+            stickyHeader.classList.add("visible");
+          } else {
+            stickyHeader.classList.remove("visible");
+          }
+        };
+        parentScroll.onscroll = onScroll;
+      }
+
+      // Song items with long-press
+      contentArea.querySelectorAll('.mobile-artist-song-item').forEach(item => {
+        let timer;
+        let isLongPress = false;
+
+        const startPress = (e) => {
+          if (e.type === 'mousedown' && e.button !== 0) return;
+          isLongPress = false;
+          timer = setTimeout(() => {
+            isLongPress = true;
+            if (navigator.vibrate) navigator.vibrate(50);
+
+            const songIndex = parseInt(item.dataset.index);
+            const song = normalizedSongs[songIndex];
+            if (window.BottomSheetManager && song) {
+              window.BottomSheetManager.open('song', song);
+            }
+          }, 500);
+        };
+
+        const cancelPress = () => clearTimeout(timer);
+
+        const handleClick = (e) => {
+          // Check if more button was clicked
+          if (e.target.closest('.mobile-artist-song-more')) {
+            e.stopPropagation();
+            const songIndex = parseInt(e.target.closest('.mobile-artist-song-more').dataset.songIndex);
+            const song = normalizedSongs[songIndex];
+            if (window.BottomSheetManager && song) {
+              window.BottomSheetManager.open('song', song);
+            }
+            return;
+          }
+
+          if (isLongPress) {
+            e.preventDefault();
+            isLongPress = false;
+            return;
+          }
+
+          const songIndex = parseInt(item.dataset.index);
+          playSongFromPlaylist(normalizedSongs, songIndex);
+        };
+
+        item.addEventListener('touchstart', startPress, { passive: true });
+        item.addEventListener('touchend', cancelPress);
+        item.addEventListener('touchmove', cancelPress);
+        item.addEventListener('mousedown', startPress);
+        item.addEventListener('mouseup', cancelPress);
+        item.addEventListener('mouseleave', cancelPress);
+        item.addEventListener('click', handleClick);
+        item.addEventListener('contextmenu', (e) => e.preventDefault());
+      });
+
+      return; // Exit early, mobile view rendered
+    }
+
+    // Desktop View (existing code below)
     // 1. Get Dynamic Color
     const { r, g, b } = await getDominantColor(artistImg);
     const bgColor = `rgb(${r}, ${g}, ${b})`;
@@ -470,7 +654,7 @@ export async function renderPlaylistPage(playlistId) {
                  <div class="song-artist-row">${artistNames}</div>
                </div>
                <div class="song-options">
-                 <button class="card-options-btn" data-song-id="${song._id}" onclick="event.stopPropagation();">
+                 <button class="card-options-btn" data-song-id="${song._id}">
                    <img src="images/icons/more.png" alt="Options" />
                  </button>
                </div>
@@ -533,12 +717,58 @@ export async function renderPlaylistPage(playlistId) {
           </div>
         `;
 
-      // 1. Row Click Listeners
+      // 1. Row Click Listeners with long-press support
       contentArea.querySelectorAll('.playlist-song-row').forEach(row => {
-        row.addEventListener('click', () => {
+        let timer;
+        let isLongPress = false;
+
+        const startPress = (e) => {
+          if (e.type === 'mousedown' && e.button !== 0) return;
+          isLongPress = false;
+          timer = setTimeout(() => {
+            isLongPress = true;
+            if (navigator.vibrate) navigator.vibrate(50);
+
+            const songIndex = parseInt(row.dataset.index);
+            const song = songs[songIndex];
+            if (window.BottomSheetManager && song) {
+              window.BottomSheetManager.open('song', song);
+            }
+          }, 500);
+        };
+
+        const cancelPress = () => clearTimeout(timer);
+
+        const handleClick = (e) => {
+          // Check if more button was clicked
+          if (e.target.closest('.card-options-btn')) {
+            e.stopPropagation();
+            const songIndex = parseInt(row.dataset.index);
+            const song = songs[songIndex];
+            if (window.BottomSheetManager && song) {
+              window.BottomSheetManager.open('song', song);
+            }
+            return;
+          }
+
+          if (isLongPress) {
+            e.preventDefault();
+            isLongPress = false;
+            return;
+          }
+
           const index = parseInt(row.dataset.index);
           playSongFromPlaylist(songs, index);
-        });
+        };
+
+        row.addEventListener('touchstart', startPress, { passive: true });
+        row.addEventListener('touchend', cancelPress);
+        row.addEventListener('touchmove', cancelPress);
+        row.addEventListener('mousedown', startPress);
+        row.addEventListener('mouseup', cancelPress);
+        row.addEventListener('mouseleave', cancelPress);
+        row.addEventListener('click', handleClick);
+        row.addEventListener('contextmenu', (e) => e.preventDefault());
       });
 
       // 2. Play Button Listener

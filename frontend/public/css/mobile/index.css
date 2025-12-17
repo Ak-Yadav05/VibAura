@@ -46,9 +46,20 @@ img,
 .library,
 .custom-scrollbar,
 #open-fullscreen-btn,
-.scroll-btn,
+.scroll-btn {
+  display: none !important;
+}
+
+/* Note: .card-options-btn removed from here to allow more buttons on playlist/artist pages */
+
+/* Hide more buttons by default (homepage), show only on playlist and artist pages */
 .card-options-btn {
   display: none !important;
+}
+
+body.playlist-view-active .card-options-btn,
+body.artist-page-active .card-options-btn {
+  display: flex !important;
 }
 
 /**
@@ -83,11 +94,12 @@ body.fullscreen-open .player-container {
 }
 
 /* 
- * FIX: reset main container when header is hidden (Search/Library)
+ * FIX: reset main container when header is hidden (Search/Library/Playlist/Artist)
  */
 body.library-page-active .main,
 body.search-page-active .main,
-body.playlist-view-active .main {
+body.playlist-view-active .main,
+body.artist-page-active .main {
   top: 0 !important;
   height: calc(100vh - 50px) !important;
   /* Only Nav remains */
