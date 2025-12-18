@@ -130,7 +130,9 @@ def get_or_create_playlist(playlist_name):
         
         playlist_doc = {
             "name": playlist_name,
-            "description": f"Playlist: {playlist_name}",
+            "description": f"Playlist automatically created from '{playlist_name}' folder.",
+            "category": "",  # Initial category is empty
+            "coverImageUrl": "",           # Will be populated by the first song
             "songs": [],
         }
         result = db.playlists.insert_one(playlist_doc)
@@ -296,10 +298,12 @@ def process_song(song_info):
         if folder_name.lower() != "all-songs":
             playlist_id = get_or_create_playlist(folder_name)
             if playlist_id:
+                # Update playlist: add song
                 db.playlists.update_one(
                     {"_id": playlist_id},
                     {"$addToSet": {"songs": song_id}}
                 )
+                
                 info(f"✅ Added to playlist: {folder_name}")
         
         first_artist_name = track_data['artists'][0]['name']

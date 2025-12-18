@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "concurrently \"node backend/server.js\" \"node backend/start-ngrok.js\" --names \"SERVER,NGROK\" --prefix-colors \"blue,magenta\""
+    "dev": "concurrently \"nodemon backend/server.js\" \"node backend/start-ngrok.js\" --names \"SERVER,NGROK\" --prefix-colors \"blue,magenta\""
   },
   "repository": {
     "type": "git",
@@ -28,6 +28,7 @@
     "nodemailer": "^7.0.11"
   },
   "devDependencies": {
-    "concurrently": "^9.2.1"
+    "concurrently": "^9.2.1",
+    "nodemon": "^3.1.11"
   }
 }

@@ -45,6 +45,13 @@ const playlistSchema = new Schema({
     trim: true, // Removes whitespace
   },
 
+  // URL to the playlist's cover image
+  coverImageUrl: {
+    type: String,
+    required: false,
+    default: "",
+  },
+
   // An array of song references.
   // This stores an array of `ObjectId`s, each linking to a
   // document in the 'Song' collection.

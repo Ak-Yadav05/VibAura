@@ -116,4 +116,32 @@ router.delete("/:playlistId/songs/:songId", async (req, res) => {
     }
 });
 
+// DELETE /api/playlists/:playlistId - Delete playlist permanently
+router.delete("/:playlistId", async (req, res) => {
+    try {
+        const { playlistId } = req.params;
+
+        const playlist = await Playlist.findById(playlistId);
+        if (!playlist) return res.status(404).json({ message: "Playlist not found" });
+
+        // Ownership check
+        if (String(playlist.owner) !== req.user.userId) {
+            return res.status(403).json({ message: "Not authorized to delete this playlist" });
+        }
+
+        // 1. Delete the playlist document
+        await Playlist.findByIdAndDelete(playlistId);
+
+        // 2. Cleanup User Library
+        await User.findByIdAndUpdate(req.user.userId, {
+            $pull: { libraryPlaylists: playlistId }
+        });
+
+        res.json({ message: "Playlist deleted successfully", playlistId });
+    } catch (err) {
+        console.error("Delete playlist error:", err);
+        res.status(500).json({ message: "Error deleting playlist" });
+    }
+});
+
 module.exports = router;
