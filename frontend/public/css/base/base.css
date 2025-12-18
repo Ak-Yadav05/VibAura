@@ -100,6 +100,27 @@ body.dark-theme {
   --color-scrollbar: #5b657a;
 }
 
+/* Global Icon Button Reset for Mobile (to avoid borders/backgrounds) */
+@media (max-width: 768px) {
+  .action-icon-btn.sort-trigger-btn {
+    background: transparent !important;
+    border: none !important;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    outline: none;
+    box-shadow: none;
+  }
+}
+
+/* Specific fix for desktop artist page sort button if needed */
+#dk-artist-sort-btn {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
 /**
  * GLOBAL RESETS
  * Normalize default browser styles for consistency

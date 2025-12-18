@@ -23,6 +23,7 @@ import { dom } from "./playerDOM.js";
 import { state } from "./playerState.js";
 import { formatTime } from "../utils/utils.js";
 import { PlaylistService } from "../services/playlistService.js";
+import { HistoryService } from "../services/historyService.js";
 
 /**
  * Loads a song object into the audio element and updates all UI displays.
@@ -156,6 +157,9 @@ function loadSong(song) {
   });
   // Immediate update if we already have data
   if (isLikedSongsFetched) updateLikeState(song._id);
+
+  // Record history
+  HistoryService.addToHistory(song._id);
 }
 
 /**

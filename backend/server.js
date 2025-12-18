@@ -54,11 +54,13 @@ app.get("/api/debug/songs-count", async (req, res) => {
 const authRoutes = require("./routes/auth");
 const libraryRoutes = require("./routes/library");
 const playlistRoutes = require("./routes/playlist");
+const historyRoutes = require("./routes/history");
 
 app.use("/api/auth", authRoutes); // Login/Signup
 app.use("/api/search", searchRoutes);
 app.use("/api/library", libraryRoutes);
 app.use("/api/playlists", playlistRoutes);
+app.use("/api/history", historyRoutes);
 
 // --- Songs ---
 app.get("/api/songs/featured", async (req, res) => {

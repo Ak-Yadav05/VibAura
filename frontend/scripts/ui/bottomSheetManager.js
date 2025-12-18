@@ -72,10 +72,30 @@ export const BottomSheetManager = {
             `;
         } else if (type === 'library-playlist') {
             const isOwner = data.isOwner;
-            const deleteLabel = isOwner ? 'Delete Playlist' : 'Remove from Library';
-            const deleteIcon = 'images/icons/delete.png';
+            const itemID = data._id || data.id;
+            const isHistory = itemID === 'recently-played';
+            const isLikedSongs = itemID === 'liked-songs';
 
-            optionsHTML = `
+            if (isHistory || isLikedSongs) {
+                const actionLabel = isHistory ? 'Play Recently Played' : 'Play Liked Songs';
+                const shareLabel = isHistory ? 'Share History' : 'Share Liked Songs';
+                const targetHash = isHistory ? '#/recently-played' : '#liked-songs';
+
+                optionsHTML = `
+                    <li class="bs-option-item" id="bs-lib-play" data-hash="${targetHash}">
+                        <img src="images/media controls/play.png" class="bs-icon icon-adaptive">
+                        <span class="bs-text">${actionLabel}</span>
+                    </li>
+                    <li class="bs-option-item" id="bs-lib-share">
+                         <img src="images/icons/share.png" class="bs-icon icon-adaptive" onerror="this.style.display='none'">
+                        <span class="bs-text">${shareLabel}</span>
+                    </li>
+                `;
+            } else {
+                const deleteLabel = isOwner ? 'Delete Playlist' : 'Remove from Library';
+                const deleteIcon = 'images/icons/delete.png';
+
+                optionsHTML = `
                 <li class="bs-option-item" id="bs-lib-delete">
                     <img src="${deleteIcon}" class="bs-icon icon-adaptive" style="opacity: 0.8;">
                     <span class="bs-text" style="color: var(--color-error, #ef4444);">${deleteLabel}</span>
@@ -89,6 +109,15 @@ export const BottomSheetManager = {
                     <span class="bs-text">Share</span>
                 </li>
             `;
+            }
+        } else if (type === 'sort-options') {
+            const options = data.options || [];
+            optionsHTML = options.map(opt => `
+                <li class="bs-option-item sort-option" data-value="${opt.value}">
+                    <img src="${opt.icon || 'images/icons/sort.png'}" class="bs-icon icon-adaptive">
+                    <span class="bs-text">${opt.label}</span>
+                </li>
+            `).join('');
         } else {
             // Playlist Options (Default/Other)
             optionsHTML = `
@@ -101,6 +130,7 @@ export const BottomSheetManager = {
 
         this.content.innerHTML = `
             <div class="bottom-sheet-handle"></div>
+            ${type !== 'sort-options' ? `
             <div class="bs-header">
                 <img src="${image}" class="bs-cover">
                 <div class="bs-meta">
@@ -108,13 +138,21 @@ export const BottomSheetManager = {
                     <span class="bs-subtitle">${subtitle}</span>
                 </div>
             </div>
+            ` : '<div class="bs-header-simple"><span class="bs-title">Sort By</span></div>'}
             <ul class="bs-options">
                 ${optionsHTML}
             </ul>
         `;
 
         // Attach Listeners
-        if (isSong) {
+        if (type === 'sort-options') {
+            this.content.querySelectorAll('.sort-option').forEach(opt => {
+                opt.addEventListener('click', () => {
+                    this.close();
+                    if (data.onSelect) data.onSelect(opt.dataset.value);
+                });
+            });
+        } else if (isSong) {
             // ... (Song listeners)
             const addToPlBtn = this.content.querySelector('#bs-add-playlist');
             if (addToPlBtn) {
@@ -139,6 +177,15 @@ export const BottomSheetManager = {
                 });
             }
         } else if (type === 'library-playlist') {
+            const playBtn = this.content.querySelector('#bs-lib-play');
+            if (playBtn) {
+                playBtn.addEventListener('click', () => {
+                    this.close();
+                    const hash = playBtn.dataset.hash || '#/recently-played';
+                    window.location.hash = hash;
+                });
+            }
+
             const delBtn = this.content.querySelector('#bs-lib-delete');
             if (delBtn) {
                 delBtn.addEventListener('click', async () => {

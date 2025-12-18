@@ -89,6 +89,18 @@ body.library-page-active .content {
   transition: all 0.2s ease;
   background-color: var(--color-background-muted);
   border: 1px solid var(--color-border);
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none !important;
+  -khtml-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  user-select: none !important;
+}
+
+.library-item * {
+  -webkit-touch-callout: none !important;
+  pointer-events: none;
+  /* Let parent handle all touch events */
 }
 
 .library-item:active {

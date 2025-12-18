@@ -261,6 +261,19 @@ body.dark-theme .content.scrolled {
   /* Constrain width to prevent overflow */
 }
 
+/* Base text styles for shared song items */
+.song-title-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.song-artist-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /**
  * DETAIL PAGE STYLES
  */

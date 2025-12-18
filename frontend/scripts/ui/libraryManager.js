@@ -8,7 +8,8 @@ export const LibraryManager = {
     },
 
     async renderLibrary() {
-        const libraryList = document.querySelector('.library-list');
+        // Target specifically the sidebar list to avoid overwriting mobile page content
+        const libraryList = document.querySelector('aside.library .library-list');
         if (!libraryList) return;
 
         const token = localStorage.getItem('vibAuraToken'); // Check token key
@@ -45,6 +46,19 @@ export const LibraryManager = {
       `;
             likedItem.onclick = () => window.location.hash = '#liked-songs';
             libraryList.appendChild(likedItem);
+
+            // "Recently Played" Item
+            const historyItem = document.createElement('li');
+            historyItem.className = 'library-item';
+            historyItem.innerHTML = `
+        <img src="images/icons/history.png" alt="Recently Played" class="library-item-img" style="padding: 12px; background: linear-gradient(135deg, #1db954, #191414);" onerror="this.src='images/icons/library.png'" />
+        <div class="library-item-info">
+          <span class="library-item-title">Recently Played</span>
+          <span class="library-item-subtitle">Virtual Playlist</span>
+        </div>
+      `;
+            historyItem.onclick = () => window.location.hash = '#/recently-played';
+            libraryList.appendChild(historyItem);
 
             // Render User Playlists
             const userStr = localStorage.getItem('vibAuraUser');

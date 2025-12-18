@@ -34,6 +34,7 @@ import {
 import { login, signup, getCurrentUser } from "../auth/authService.js";
 import { initAuthUI } from "./authUI.js";
 import { PlaylistService } from "../services/playlistService.js";
+import { HistoryService } from "../services/historyService.js";
 import { LibraryManager } from "./libraryManager.js";
 
 // Helper function to get the main content area element
@@ -41,6 +42,33 @@ const getContentArea = () => document.getElementById("album-sections");
 
 // Cache for homepage data to prevent redundant invalidation/loading states
 let cachedHomepageData = null;
+
+/**
+ * Utility to sort an array of songs based on criteria.
+ * @param {Array} songs - The array of song objects.
+ * @param {string} criteria - 'recents', 'title', 'artist', 'album'.
+ * @returns {Array} - The sorted array (shallow copy).
+ */
+function sortSongs(songs, criteria) {
+  if (!songs || !Array.isArray(songs)) return [];
+  const sorted = [...songs];
+
+  switch (criteria) {
+    case 'title':
+      return sorted.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
+    case 'artist':
+      return sorted.sort((a, b) => {
+        const artistA = (a.artists && a.artists[0] ? a.artists[0].name : '');
+        const artistB = (b.artists && b.artists[0] ? b.artists[0].name : '');
+        return artistA.localeCompare(artistB);
+      });
+    case 'album':
+      return sorted.sort((a, b) => (a.album || '').localeCompare(b.album || ''));
+    case 'recents':
+    default:
+      return sorted; // 'recents' is usually the natural order from API
+  }
+}
 
 /**
  * Renders the home page with trending content and album sections.
@@ -142,7 +170,7 @@ export async function renderHomePage() {
  * @param {string} artistId - MongoDB ID of the artist to display
  * @returns {Promise<void>}
  */
-export async function renderArtistPage(artistId) {
+export async function renderArtistPage(artistId, sortCriteria = 'recents') {
   const contentArea = getContentArea();
   if (!contentArea) {
     console.error("[PageRenderer] ERROR: album-sections element not found!");
@@ -172,7 +200,10 @@ export async function renderArtistPage(artistId) {
 
     const data = await response.json();
     const artist = data.artist;
-    const songs = data.songs || [];
+    let songs = data.songs || [];
+
+    // Apply sorting
+    songs = sortSongs(songs, sortCriteria);
 
     // Fallback artworks
     const artistImg = artist.artworkUrl || artist.imageUrl || "https://placehold.co/300x300?text=Artist";
@@ -222,6 +253,18 @@ export async function renderArtistPage(artistId) {
 
     if (isMobile) {
       // Render Mobile View (Playlist Style)
+      // Controls Row (Pill Buttons) - Added Sort
+      const mobileControlsHTML = `
+        <div class="play-shuffle-row" style="padding: 1rem; padding-bottom: 0;">
+            <button class="play-btn-pill" id="mobile-play-btn" style="flex: 1;">
+                <img src="images/media controls/play.png" class="btn-icon"> Play
+            </button>
+            <button class="action-icon-btn sort-trigger-btn" id="mobile-sort-btn" title="Sort">
+                <img src="images/icons/sort.png" class="icon-adaptive" style="width:24px; height:24px;">
+            </button>
+        </div>
+      `;
+
       let songsHTML = "";
       if (normalizedSongs.length > 0) {
         songsHTML = normalizedSongs.map((song, index) => {
@@ -275,6 +318,7 @@ export async function renderArtistPage(artistId) {
           <!-- Content Section -->
           <div class="mobile-artist-content">
             <h2 class="mobile-artist-section-title">Songs</h2>
+            ${mobileControlsHTML}
             <div class="mobile-artist-song-list">
               ${songsHTML}
             </div>
@@ -296,6 +340,31 @@ export async function renderArtistPage(artistId) {
           }
         };
         parentScroll.onscroll = onScroll;
+      }
+
+      // 1. Attach sort listener
+      const mbSortBtn = contentArea.querySelector("#mobile-sort-btn");
+      if (mbSortBtn) {
+        mbSortBtn.addEventListener("click", () => {
+          if (window.BottomSheetManager) {
+            window.BottomSheetManager.open('sort-options', {
+              options: [
+                { label: 'Recents', value: 'recents' },
+                { label: 'Title (A-Z)', value: 'title' },
+                { label: 'Album', value: 'album' }
+              ],
+              onSelect: (criteria) => renderArtistPage(artistId, criteria)
+            });
+          }
+        });
+      }
+
+      // 2. Play Button Listener
+      const playBtn = contentArea.querySelector("#mobile-play-btn");
+      if (playBtn) {
+        playBtn.addEventListener("click", () => {
+          if (normalizedSongs.length > 0) playSongFromPlaylist(normalizedSongs, 0);
+        });
       }
 
       // Song items with long-press
@@ -416,6 +485,9 @@ export async function renderArtistPage(artistId) {
                  <img src="images/media controls/play.png" alt="Play">
                </button>
                <button class="action-follow-btn">Follow</button>
+               <button class="action-icon-btn sort-trigger-btn" id="dk-artist-sort-btn" title="Sort">
+                  <img src="images/icons/sort.png" alt="Sort" class="icon-adaptive icon-sort">
+               </button>
                
                <span class="sticky-artist-name">${artist.name}</span>
             </div>
@@ -446,29 +518,38 @@ export async function renderArtistPage(artistId) {
     const stickyGroup = contentArea.querySelector("#artist-sticky");
     const mainHeader = contentArea.querySelector("#artist-header");
 
+    const handlePlay = () => playSongFromPlaylist(songs, 0);
+    const mainPlayBtn = contentArea.querySelector("#artist-play-btn");
+    if (songs.length > 0 && mainPlayBtn) mainPlayBtn.addEventListener("click", handlePlay);
+
+    const handleSort = (criteria) => {
+      renderArtistPage(artistId, criteria);
+    };
+
+    const dkSortBtn = contentArea.querySelector("#dk-artist-sort-btn");
+    if (dkSortBtn) {
+      dkSortBtn.addEventListener("click", () => {
+        const options = [
+          { label: 'Recents', value: 'recents' },
+          { label: 'Title (A-Z)', value: 'title' },
+          { label: 'Album', value: 'album' }
+        ];
+        const msg = `Sort By:\n${options.map(o => o.value).join(', ')}`;
+        const choice = prompt(msg, sortCriteria);
+        if (choice && options.some(o => o.value === choice)) {
+          handleSort(choice);
+        }
+      });
+    }
+
     // Scroll Logic
     scrollContainer.onscroll = () => {
       const scrollY = scrollContainer.scrollTop;
       const triggerPoint = 300;
-
-      if (scrollY > triggerPoint) {
-        stickyGroup.classList.add("stuck");
-      } else {
-        stickyGroup.classList.remove("stuck");
-      }
-
-      if (mainHeader) {
-        mainHeader.style.opacity = Math.max(0, 1 - (scrollY / 280));
-      }
+      if (scrollY > triggerPoint) stickyGroup.classList.add("stuck");
+      else stickyGroup.classList.remove("stuck");
+      if (mainHeader) mainHeader.style.opacity = Math.max(0, 1 - (scrollY / 280));
     };
-
-    // Play Buttons
-    const handlePlay = () => playSongFromPlaylist(songs, 0);
-    const mainPlayBtn = contentArea.querySelector("#artist-play-btn");
-
-    if (songs.length > 0 && mainPlayBtn) {
-      mainPlayBtn.addEventListener("click", handlePlay);
-    }
 
     // Row Click
     contentArea.querySelectorAll(".song-item").forEach((item) => {
@@ -523,7 +604,7 @@ function getContrastColor(r, g, b) {
  * @param {string} playlistId - MongoDB ID of the playlist to display
  * @returns {Promise<void>}
  */
-export async function renderPlaylistPage(playlistId) {
+export async function renderPlaylistPage(playlistId, sortCriteria = 'recents') {
   const contentArea = getContentArea();
   if (!contentArea) return;
 
@@ -532,7 +613,10 @@ export async function renderPlaylistPage(playlistId) {
     scrollContainer.classList.add("no-padding");
   }
 
-  contentArea.innerHTML = `<div class="page-view"><p>Loading playlist...</p></div>`;
+  // If this is a first load, show loader
+  if (!contentArea.querySelector('.playlist-page')) {
+    contentArea.innerHTML = `<div class="page-view"><p>Loading playlist...</p></div>`;
+  }
 
   try {
     const response = await fetch(`/api/playlists/${playlistId}`, {
@@ -541,7 +625,11 @@ export async function renderPlaylistPage(playlistId) {
     if (!response.ok) throw new Error("Playlist not found");
 
     const playlist = await response.json();
-    const songs = playlist.songs || [];
+    let songs = playlist.songs || [];
+
+    // Apply sorting
+    songs = sortSongs(songs, sortCriteria);
+
     const coverImage = playlist.artworkUrl || playlist.coverImageUrl || "images/Playlist.png";
     const songCount = songs.length;
 
@@ -583,30 +671,30 @@ export async function renderPlaylistPage(playlistId) {
     const rgb = await getDominantColor(coverImage);
     const bgColor = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
 
-    // --- LAYOUT ADJUSTMENTS ---
-
-    // --- LAYOUT ADJUSTMENTS ---
-    // Hide default mobile header for immersive experience
-    const mobileHeader = document.querySelector('.mobile-header');
-    if (mobileHeader) mobileHeader.style.display = 'none';
+    // Create Generic Actions HTML (Sort)
+    const sortBtnHTML = `
+      <button class="action-icon-btn sort-trigger-btn" title="Sort Songs">
+          <img src="images/icons/sort.png" alt="Sort" class="icon-adaptive icon-sort">
+      </button>
+    `;
 
     // Create Owner Actions HTML
-    let ownerActionsHTML = "";
+    let ownerActionsHTML = sortBtnHTML;
     if (isOwner) {
-      ownerActionsHTML = `
+      ownerActionsHTML += `
             <button class="action-icon-btn" id="rename-playlist-btn" title="Rename">
                 <img src="images/icons/edit.png" alt="Edit" class="icon-adaptive icon-edit">
             </button>
         `;
     } else {
       if (isSaved) {
-        ownerActionsHTML = `
+        ownerActionsHTML += `
             <button class="action-icon-btn" id="save-library-btn" title="Already in Linked" style="cursor: default;">
                 <img src="images/icons/check.png" alt="Saved" class="icon-adaptive icon-check">
             </button>
         `;
       } else {
-        ownerActionsHTML = `
+        ownerActionsHTML += `
             <button class="action-icon-btn" id="save-library-btn" title="Save to Library">
                 <img src="images/icons/plus.png" alt="Save" class="icon-adaptive icon-save">
             </button>
@@ -704,6 +792,9 @@ export async function renderPlaylistPage(playlistId) {
                    <button class="shuffle-btn-pill" id="mobile-shuffle-btn">
                       <img src="images/media controls/shuffle.png" class="btn-icon"> Shuffle
                    </button>
+                   <button class="action-icon-btn sort-trigger-btn" id="mobile-sort-btn" title="Sort">
+                      <img src="images/icons/sort.png" class="icon-adaptive" style="width:24px; height:24px;">
+                   </button>
                </div>
             </div>
     
@@ -716,6 +807,18 @@ export async function renderPlaylistPage(playlistId) {
             ${songs.length === 0 ? '<div style="text-align:center; padding:20px; opacity:0.6;">No songs yet</div>' : ''}
           </div>
         `;
+
+      // --- SORTING HANDLER (Shared) ---
+      const handleSort = (criteria) => {
+        renderPlaylistPage(playlistId, criteria);
+      };
+
+      const sortOptionsArr = [
+        { label: 'Recents', value: 'recents' },
+        { label: 'Title (A-Z)', value: 'title' },
+        { label: 'Artist', value: 'artist' },
+        { label: 'Album', value: 'album' }
+      ];
 
       // 1. Row Click Listeners with long-press support
       contentArea.querySelectorAll('.playlist-song-row').forEach(row => {
@@ -744,7 +847,7 @@ export async function renderPlaylistPage(playlistId) {
           if (e.target.closest('.card-options-btn')) {
             e.stopPropagation();
             const songIndex = parseInt(row.dataset.index);
-            const song = songs[songIndex];
+            const song = songs[songIndex]; // Use sorted songs
             if (window.BottomSheetManager && song) {
               window.BottomSheetManager.open('song', song);
             }
@@ -758,7 +861,7 @@ export async function renderPlaylistPage(playlistId) {
           }
 
           const index = parseInt(row.dataset.index);
-          playSongFromPlaylist(songs, index);
+          playSongFromPlaylist(songs, index); // Use sorted songs
         };
 
         row.addEventListener('touchstart', startPress, { passive: true });
@@ -787,6 +890,19 @@ export async function renderPlaylistPage(playlistId) {
             // Create a shuffled copy
             const shuffled = [...songs].sort(() => Math.random() - 0.5);
             playSongFromPlaylist(shuffled, 0);
+          }
+        });
+      }
+
+      // 4. Sort Button Listener (Mobile)
+      const mbSortBtn = contentArea.querySelector("#mobile-sort-btn");
+      if (mbSortBtn) {
+        mbSortBtn.addEventListener("click", () => {
+          if (window.BottomSheetManager) {
+            window.BottomSheetManager.open('sort-options', {
+              options: sortOptionsArr,
+              onSelect: handleSort
+            });
           }
         });
       }
@@ -948,7 +1064,32 @@ export async function renderPlaylistPage(playlistId) {
           }
         });
       });
+    }
 
+    // --- SORTING HANDLER (Desktop) ---
+    const handleSort = (criteria) => {
+      renderPlaylistPage(playlistId, criteria);
+    };
+
+    const sortOptionsArr = [
+      { label: 'Recents', value: 'recents' },
+      { label: 'Title (A-Z)', value: 'title' },
+      { label: 'Artist', value: 'artist' },
+      { label: 'Album', value: 'album' }
+    ];
+
+    // Desktop Sort Button
+    const dkSortBtn = contentArea.querySelector(".actions-left .sort-trigger-btn");
+    if (dkSortBtn) {
+      dkSortBtn.addEventListener("click", () => {
+        const choice = prompt(`Sort By:\n${sortOptionsArr.map(o => o.value).join(', ')}`, sortCriteria);
+        if (choice && sortOptionsArr.some(o => o.value === choice)) {
+          handleSort(choice);
+        }
+      });
+    }
+
+    if (isOwner) {
       const renameBtn = document.getElementById('rename-playlist-btn');
       if (renameBtn) {
         renameBtn.addEventListener('click', async () => {
@@ -1045,11 +1186,32 @@ export async function renderLibraryPage() {
 
     // Liked Songs
     listHTML += `
-        <li class="library-item" onclick="window.location.hash = '#liked-songs'">
-          <img src="images/media controls/favourite.png" alt="Liked Songs" class="library-item-img" style="padding: 12px; background: linear-gradient(135deg, #450af5, #c4efd9);" />
-          <div class="library-item-info">
+        <li class="library-item mobile-playlist-item" 
+            data-id="liked-songs" 
+            data-name="Liked Songs" 
+            data-is-owner="false"
+            data-cover="images/media controls/favourite.png"
+            style="position: relative;">
+          <img src="images/media controls/favourite.png" alt="Liked Songs" class="library-item-img" style="padding: 12px; background: linear-gradient(135deg, #450af5, #c4efd9); pointer-events: none;" />
+          <div class="library-item-info" style="pointer-events: none;">
             <span class="library-item-title">Liked Songs</span>
             <span class="library-item-subtitle">Playlist • ${likedSongs.length} songs</span>
+          </div>
+        </li>
+    `;
+
+    // Recently Played
+    listHTML += `
+        <li class="library-item mobile-playlist-item" 
+            data-id="recently-played" 
+            data-name="Recently Played" 
+            data-is-owner="false"
+            data-cover="images/icons/history.png"
+            style="position: relative;">
+          <img src="images/icons/history.png" alt="Recently Played" class="library-item-img" style="padding: 12px; background: linear-gradient(135deg, #1db954, #191414); pointer-events: none;" onerror="this.src='images/icons/library.png'" />
+          <div class="library-item-info" style="pointer-events: none;">
+            <span class="library-item-title">Recently Played</span>
+            <span class="library-item-subtitle">Virtual Playlist</span>
           </div>
         </li>
     `;
@@ -1071,7 +1233,7 @@ export async function renderLibraryPage() {
                 data-name="${p.name}" 
                 data-is-owner="${isOwner}"
                 data-cover="${cover}"
-                style="position: relative; user-select: none;">
+                style="position: relative;">
               <img src="${cover}" alt="${p.name}" class="library-item-img" style="pointer-events: none;" />
               <div class="library-item-info" style="pointer-events: none;">
                 <span class="library-item-title">${p.name}</span>
@@ -1094,68 +1256,81 @@ export async function renderLibraryPage() {
         ${listHTML}
       </ul>
     </div>
-  `;
+    `;
 
     const btn = contentArea.querySelector('#mobile-create-pl-btn');
     if (btn) btn.addEventListener('click', () => window.openCreatePlaylistModal());
 
-    // Attach Long Press Listeners
+    // Attach Bulletproof Long Press & Context Menu Listeners
     contentArea.querySelectorAll('.mobile-playlist-item').forEach(item => {
       let timer;
       let isLongPress = false;
 
+      const triggerBottomSheet = () => {
+        if (window.BottomSheetManager) {
+          window.BottomSheetManager.open('library-playlist', {
+            _id: item.dataset.id,
+            name: item.dataset.name,
+            isOwner: item.dataset.isOwner === 'true',
+            coverImageUrl: item.dataset.cover
+          });
+        }
+      };
+
       const startPress = (e) => {
-        // Don't start if it's a right click or similar
+        if (timer) clearTimeout(timer);
         if (e.type === 'mousedown' && e.button !== 0) return;
 
         isLongPress = false;
         timer = setTimeout(() => {
           isLongPress = true;
-          // Trigger Vibrate
           if (navigator.vibrate) navigator.vibrate(50);
-
-          // Open Bottom Sheet
-          if (window.BottomSheetManager) {
-            window.BottomSheetManager.open('library-playlist', {
-              _id: item.dataset.id,
-              name: item.dataset.name,
-              isOwner: item.dataset.isOwner === 'true',
-              coverImageUrl: item.dataset.cover
-            });
-          }
-        }, 500); // 500ms threshold
+          triggerBottomSheet();
+        }, 600);
       };
 
       const cancelPress = () => {
-        clearTimeout(timer);
+        if (timer) clearTimeout(timer);
       };
 
       const handleClick = (e) => {
         if (isLongPress) {
           e.preventDefault();
           e.stopPropagation();
-          isLongPress = false; // Reset
+          isLongPress = false;
           return;
         }
-        // Navigate only if NOT a long press
-        window.location.hash = `#/playlist/${item.dataset.id}`;
+
+        if (item.dataset.id === 'recently-played') {
+          window.location.hash = '#/recently-played';
+        } else if (item.dataset.id === 'liked-songs') {
+          window.location.hash = '#liked-songs';
+        } else {
+          window.location.hash = `#/playlist/${item.dataset.id}`;
+        }
       };
 
-      // Touch
-      item.addEventListener('touchstart', startPress, { passive: true });
-      item.addEventListener('touchend', cancelPress);
-      item.addEventListener('touchmove', cancelPress); // Cancel if scrolling
+      // 1. CSS approach (already in file but doubling here for safety)
+      item.style.webkitTouchCallout = 'none';
+      item.style.webkitUserSelect = 'none';
+      item.style.userSelect = 'none';
 
-      // Mouse (for testing/desktop view of mobile page)
+      // Note: Native context menu is now suppressed globally in mobile.js
+
+      // 3. Touch events for hold detection
+      // Note: passive: false is critical for some browsers to allow immediate suppression
+      item.addEventListener('touchstart', startPress, { passive: false });
+      item.addEventListener('touchend', cancelPress);
+      item.addEventListener('touchcancel', cancelPress);
+      item.addEventListener('touchmove', cancelPress);
+
+      // 4. Mouse events for testing
       item.addEventListener('mousedown', startPress);
       item.addEventListener('mouseup', cancelPress);
       item.addEventListener('mouseleave', cancelPress);
 
-      // Click & Context Menu
+      // 5. Final navigation handler
       item.addEventListener('click', handleClick);
-      item.addEventListener('contextmenu', (e) => {
-        e.preventDefault(); // Prevent native menu on long hold
-      });
     });
 
   } catch (err) {
@@ -1229,7 +1404,9 @@ export function renderSearchPage() {
         </div>
       </div>
     </div>
-    </div > `;
+  </div>`;
+
+  // Explicitly set focus or other logic if needed after rendering contentArea.innerHTML
 
   // Mark the page as active
   document.body.classList.add("search-page-active");
@@ -1619,7 +1796,7 @@ export function renderResetPasswordPage() {
  * Renders the Liked Songs page.
  * Fetches user's liked songs from the library API and displays them as a virtual playlist.
  */
-export async function renderLikedSongsPage() {
+export async function renderLikedSongsPage(sortCriteria = 'recents') {
   document.body.classList.remove("library-page-active"); // Fix mobile layout
   document.body.classList.remove("search-page-active");
   document.body.classList.add("playlist-view-active"); // Enable header visibility for recursive header
@@ -1639,7 +1816,10 @@ export async function renderLikedSongsPage() {
   try {
     // Fetch library including liked songs
     const data = await PlaylistService.getUserLibrary();
-    const likedSongs = data.likedSongs || [];
+    let likedSongs = data.likedSongs || [];
+
+    // Apply sorting
+    likedSongs = sortSongs(likedSongs, sortCriteria);
 
     // Manually construct a "Playlist" object for the renderer
     const mockPlaylist = {
@@ -1737,6 +1917,9 @@ export async function renderLikedSongsPage() {
                    <button class="shuffle-btn-pill" id="liked-shuffle-btn">
                       <img src="images/media controls/shuffle.png" class="btn-icon"> Shuffle
                    </button>
+                   <button class="action-icon-btn sort-trigger-btn" id="liked-mobile-sort-btn" title="Sort">
+                      <img src="images/icons/sort.png" class="icon-adaptive" style="width:24px; height:24px;">
+                   </button>
                </div>
             </div>
     
@@ -1766,6 +1949,23 @@ export async function renderLikedSongsPage() {
             stickyHeader.classList.remove("visible");
           }
         };
+      }
+
+      // 1. Sort Button Listener (Mobile)
+      const mbSortBtn = contentArea.querySelector("#liked-mobile-sort-btn");
+      if (mbSortBtn) {
+        mbSortBtn.addEventListener("click", () => {
+          if (window.BottomSheetManager) {
+            window.BottomSheetManager.open('sort-options', {
+              options: [
+                { label: 'Recents', value: 'recents' },
+                { label: 'Title (A-Z)', value: 'title' },
+                { label: 'Artist', value: 'artist' }
+              ],
+              onSelect: (criteria) => renderLikedSongsPage(criteria)
+            });
+          }
+        });
       }
 
     } else {
@@ -1807,7 +2007,7 @@ export async function renderLikedSongsPage() {
                   </div>
                 </div>
                 <div class="col-album">${albumName}</div>
-                <div class="col-duration">${durationStr}</div>
+                <div class="col-duration">${formatTime(song.duration)}</div>
                 <div class="col-actions">
                    <button class="icon-btn small remove-song-btn" data-song-id="${song._id}" title="Remove from Liked Songs">
                      <img src="images/media controls/favourite-filled.png" class="icon-adaptive small icon-trash" style="filter: brightness(0) saturate(100%) invert(28%) sepia(93%) saturate(1989%) hue-rotate(307deg) brightness(91%) contrast(92%);">
@@ -1842,6 +2042,9 @@ export async function renderLikedSongsPage() {
                    <div class="actions-left">
                        <button class="action-play-btn" id="liked-play-btn">
                          <img src="images/media controls/play.png" alt="Play">
+                       </button>
+                       <button class="action-icon-btn sort-trigger-btn" id="liked-dk-sort-btn" title="Sort">
+                          <img src="images/icons/sort.png" alt="Sort" class="icon-adaptive icon-sort">
                        </button>
                    </div>
                    <span class="sticky-group-title">Liked Songs</span>
@@ -1906,6 +2109,22 @@ export async function renderLikedSongsPage() {
 
     // Shared Shuffle (Desktop doesn't show shuffle in this design, but if it did...)
 
+    // Sort logic (Desktop)
+    const dkSortBtn = contentArea.querySelector("#liked-dk-sort-btn");
+    if (dkSortBtn) {
+      dkSortBtn.addEventListener("click", () => {
+        const options = [
+          { label: 'Recents', value: 'recents' },
+          { label: 'Title (A-Z)', value: 'title' },
+          { label: 'Artist', value: 'artist' }
+        ];
+        const choice = prompt(`Sort By:\n${options.map(o => o.value).join(', ')}`, sortCriteria);
+        if (choice && options.some(o => o.value === choice)) {
+          renderLikedSongsPage(choice);
+        }
+      });
+    }
+
     // Register global playlist
     if (window.registerPlaylist) window.registerPlaylist(mockPlaylist);
 
@@ -1915,3 +2134,265 @@ export async function renderLikedSongsPage() {
     contentArea.innerHTML = `<div class="page-view error"><p>Error loading Liked Songs</p></div>`;
   }
 }
+
+/**
+ * Renders the Recently Played history page.
+ *
+ * @async
+ * @exports renderRecentlyPlayedPage
+ * @param {string} sortCriteria
+ * @returns {Promise<void>}
+ */
+export async function renderRecentlyPlayedPage(sortCriteria = 'recents') {
+  const contentArea = getContentArea();
+  if (!contentArea) return;
+
+  const scrollContainer = contentArea.parentElement;
+  if (scrollContainer && scrollContainer.classList.contains("content")) {
+    scrollContainer.classList.add("no-padding");
+  }
+
+  contentArea.innerHTML = `<div class="page-view"><p>Loading history...</p></div>`;
+
+  try {
+    const historyData = await HistoryService.getHistory();
+    // historyData is array of { song: { ... }, playedAt: Date }
+    const songs = historyData.map(item => ({
+      ...item.song,
+      playedAt: item.playedAt
+    }));
+
+    const coverImage = "images/icons/history.png";
+    const songCount = songs.length;
+
+    // Calc total duration
+    const totalDurationSec = songs.reduce((acc, s) => acc + (s.duration || 0), 0);
+    const totalMinutes = Math.floor(totalDurationSec / 60);
+
+    // Apply sorting
+    const sortedSongs = sortSongs(songs, sortCriteria);
+
+    const bgColor = "rgb(29, 185, 84)";
+
+    document.body.classList.add('playlist-view-active');
+
+    const isMobile = window.innerWidth <= 768;
+
+    if (isMobile) {
+      const mobileSongListHTML = sortedSongs.map((song, index) => {
+        const artistNames = (song.artists && song.artists.length > 0)
+          ? song.artists.map(a => a.name).join(", ")
+          : "Unknown Artist";
+
+        const artwork = song.artworkUrl || "images/default-album.png";
+
+        return `
+            <div class="playlist-song-row" data-index="${index}" data-song-id="${song._id}">
+               <div class="song-index">
+                 <img src="${artwork}" class="song-list-art" loading="lazy">
+               </div>
+               <div class="song-main-info">
+                 <div class="song-title-row">${song.title}</div>
+                 <div class="song-artist-row">${artistNames}</div>
+               </div>
+               <div class="song-options">
+                 <button class="card-options-btn" data-song-id="${song._id}">
+                   <img src="images/icons/more.png" alt="Options" />
+                 </button>
+               </div>
+            </div>`;
+      }).join("");
+
+      contentArea.innerHTML = `
+          <div class="page-view playlist-mode" style="background: var(--color-background-surface);">
+            <div class="mobile-sticky-header" id="mobile-history-sticky">
+               <button class="sticky-back-btn" onclick="window.history.back()">
+                  <img src="images/icons/back.png" alt="Back" class="icon-adaptive">
+               </button>
+               <span class="sticky-title">Recently Played</span>
+               <div style="width: 24px;"></div>
+            </div>
+
+            <div class="playlist-header">
+               <div class="header-top-row">
+                   <div class="playlist-cover-wrapper">
+                     <img src="${coverImage}" alt="Recently Played" class="playlist-cover" onerror="this.src='images/music.png'" style="padding: 20px; background: linear-gradient(135deg, #1db954, #191414);">
+                   </div>
+                   <div class="playlist-info">
+                     <span class="playlist-type">History</span>
+                     <h1 class="playlist-title">Recently Played</h1>
+                     <div class="playlist-meta">
+                        <span>Stored locally</span>
+                        <span class="bullet">•</span>
+                        <span>${songCount} songs</span>
+                     </div>
+                   </div>
+               </div>
+
+               <!-- Controls Row -->
+               <div class="play-shuffle-row" style="padding: 1rem; padding-top: 0;">
+                   <button class="action-icon-btn sort-trigger-btn" id="history-mobile-sort-btn" title="Sort" style="margin-left: auto;">
+                      <img src="images/icons/sort.png" class="icon-adaptive" style="width:24px; height:24px;">
+                   </button>
+               </div>
+            </div>
+    
+            <div class="playlist-songs-list">
+               ${mobileSongListHTML}
+            </div>
+            ${songs.length === 0 ? '<div style="text-align:center; padding:40px; opacity:0.6;">No history yet. Start playing some music!</div>' : ''}
+          </div>`;
+
+      // Mobile Scroll Listener
+      const stickyHeader = contentArea.querySelector("#mobile-history-sticky");
+      if (scrollContainer) {
+        scrollContainer.onscroll = () => {
+          if (scrollContainer.scrollTop > 150) {
+            stickyHeader.classList.add("visible");
+          } else {
+            stickyHeader.classList.remove("visible");
+          }
+        };
+      }
+
+      contentArea.querySelectorAll('.playlist-song-row').forEach(row => {
+        row.addEventListener('click', (e) => {
+          if (e.target.closest('.card-options-btn')) {
+            const index = parseInt(row.dataset.index);
+            if (window.BottomSheetManager) window.BottomSheetManager.open('song', sortedSongs[index]);
+            return;
+          }
+          const index = parseInt(row.dataset.index);
+          playSongFromPlaylist(sortedSongs, index);
+        });
+      });
+
+      // Sort Listener (Mobile)
+      const mbSortBtn = contentArea.querySelector("#history-mobile-sort-btn");
+      if (mbSortBtn) {
+        mbSortBtn.addEventListener("click", () => {
+          if (window.BottomSheetManager) {
+            window.BottomSheetManager.open('sort-options', {
+              options: [
+                { label: 'Recently Played', value: 'recents' },
+                { label: 'Title (A-Z)', value: 'title' },
+                { label: 'Artist', value: 'artist' }
+              ],
+              onSelect: (criteria) => renderRecentlyPlayedPage(criteria)
+            });
+          }
+        });
+      }
+
+    } else {
+      // DESKTOP VIEW
+      const songsListHTML = sortedSongs.map((song, index) => {
+        const artistNames = (song.artists && song.artists.length > 0)
+          ? song.artists.map(a => a.name).join(", ")
+          : "Unknown Artist";
+
+        return `
+          <div class="playlist-row song-item" data-index="${index}">
+            <div class="col-index">
+              <span class="index-num">${index + 1}</span>
+              <span class="play-icon-row">▶</span>
+            </div>
+            <div class="col-title">
+              <img src="${song.artworkUrl || 'images/music.png'}" alt="${song.title}">
+              <div class="song-meta-text">
+                <span class="song-title-text">${song.title}</span>
+                <span class="song-artist-text">${artistNames}</span>
+              </div>
+            </div>
+            <div class="col-album">${song.album || "Single"}</div>
+            <div class="col-duration">${formatTime(song.duration)}</div>
+          </div>`;
+      }).join("");
+
+      contentArea.innerHTML = `
+        <div class="page-view playlist-page" style="--dynamic-bg: ${bgColor}; --dynamic-text: white;">
+          <div class="playlist-header-dynamic" id="history-main-header">
+            <div class="header-content-wrapper">
+              <img src="${coverImage}" class="playlist-cover-large" onerror="this.src='images/music.png'" style="padding: 40px; background: linear-gradient(135deg, #1db954, #191414);">
+              <div class="playlist-details-large">
+                <span class="playlist-label">Virtual Playlist</span>
+                <h1 class="playlist-title-large">Recently Played</h1>
+                <p class="playlist-description">
+                  <span>Your History</span> • 
+                  <span>${songCount} songs</span>, 
+                  <span>about ${totalMinutes} min</span>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="playlist-sticky-group" id="history-sticky-group">
+            <div class="playlist-actions-bar">
+               <div class="actions-left">
+                   <button class="action-play-btn" id="history-play-btn">
+                     <img src="images/media controls/play.png" alt="Play">
+                   </button>
+                   <button class="action-icon-btn sort-trigger-btn" id="history-dk-sort-btn" title="Sort">
+                      <img src="images/icons/sort.png" alt="Sort" class="icon-adaptive icon-sort">
+                   </button>
+               </div>
+               <span class="sticky-group-title">Recently Played</span>
+            </div>
+
+            <div class="song-list-header">
+              <div class="col-header col-index">#</div>
+              <div class="col-header col-title">Title</div>
+              <div class="col-header col-album">Album</div>
+              <div class="col-header col-right col-duration">
+                 <img src="images/icons/clock.png" class="icon-adaptive small icon-clock">
+              </div>
+            </div>
+          </div>
+
+          <div class="song-list-container">
+            <div class="playlist-song-list">
+               ${songsListHTML}
+            </div>
+            ${songs.length === 0 ? '<div class="empty-state"><p>No history yet. Play some tracks!</p></div>' : ''}
+          </div>
+        </div>`;
+
+      // Desktop Scroll logic
+      const stickyGroup = contentArea.querySelector("#history-sticky-group");
+      const mainHeader = contentArea.querySelector("#history-main-header");
+      scrollContainer.onscroll = () => {
+        const scrollY = scrollContainer.scrollTop;
+        if (scrollY > 300) stickyGroup.classList.add("stuck");
+        else stickyGroup.classList.remove("stuck");
+        if (mainHeader) mainHeader.style.opacity = Math.max(0, 1 - (scrollY / 280));
+      };
+
+      const playBtn = contentArea.querySelector("#history-play-btn");
+      if (playBtn && sortedSongs.length > 0) {
+        playBtn.onclick = () => playSongFromPlaylist(sortedSongs, 0);
+      }
+
+      const dkSortBtn = contentArea.querySelector("#history-dk-sort-btn");
+      if (dkSortBtn) {
+        dkSortBtn.addEventListener("click", () => {
+          const choice = prompt(`Sort By:\nrecents, title, artist`, sortCriteria);
+          if (choice && ['recents', 'title', 'artist'].includes(choice)) {
+            renderRecentlyPlayedPage(choice);
+          }
+        });
+      }
+
+      contentArea.querySelectorAll(".song-item").forEach(item => {
+        item.onclick = () => {
+          const index = parseInt(item.dataset.index);
+          playSongFromPlaylist(sortedSongs, index);
+        };
+      });
+    }
+
+  } catch (err) {
+    console.error("Error rendering history page:", err);
+    contentArea.innerHTML = `<div class="page-view"><p class="error-message">Failed to load history.</p></div>`;
+  }
+}
+

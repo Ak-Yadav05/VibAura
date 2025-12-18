@@ -19,18 +19,12 @@
 
 /* LIGHT MODE: Default surface color */
 .playlist-page {
-    background: var(--color-background-surface) !important;
+    background: var(--color-view-playlist-bg) !important;
 }
 
 /* DARK MODE: Adaptive Gradient - Seamless Transition */
 body.dark-theme .playlist-page {
-    /* Layered Background: 
-       1. Gradient from Dynamic Color to Transparent (Top)
-       2. Solid Surface Color (Bottom)
-       This guarantees a perfect match at the bottom with the rest of the app. */
-    background:
-        linear-gradient(to bottom, var(--dynamic-bg) 0%, rgba(0, 0, 0, 0) 600px),
-        var(--color-background-surface) !important;
+    background: var(--color-view-playlist-bg) !important;
     background-blend-mode: normal;
 }
 
@@ -48,16 +42,13 @@ body.dark-theme .playlist-page {
 
 /* LIGHT MODE: Theme Gradient */
 .playlist-header-dynamic {
-    background: linear-gradient(135deg, var(--color-gradient-start), var(--color-gradient-end));
+    background: var(--color-view-playlist-bg);
     color: var(--color-text-primary);
 }
 
 /* DARK MODE: Smoother overlay for better text contrast */
 body.dark-theme .playlist-header-dynamic {
-    background: linear-gradient(to bottom,
-            transparent 0%,
-            rgba(0, 0, 0, 0.2) 60%,
-            rgba(0, 0, 0, 0.6) 100%);
+    background: var(--color-view-playlist-bg);
     color: var(--dynamic-text);
 }
 
@@ -132,13 +123,13 @@ body.dark-theme .playlist-header-dynamic {
 
 /* LIGHT MODE STUCK: Solid Surface Color */
 .playlist-sticky-group.stuck {
-    background-color: var(--color-background-surface) !important;
+    background-color: var(--color-view-playlist-bg) !important;
     color: var(--color-text-primary);
 }
 
 /* DARK MODE STUCK: Dynamic Dark Color */
 body.dark-theme .playlist-sticky-group.stuck {
-    background-color: var(--dynamic-bg, #121212) !important;
+    background-color: var(--color-view-playlist-bg) !important;
     color: var(--dynamic-text);
 }
 
@@ -275,21 +266,21 @@ body.dark-theme .song-list-container {
 
 .song-list-header {
     display: grid;
-    grid-template-columns: 40px 6fr 4fr 1fr;
-    padding: 0 16px 12px 16px;
+    grid-template-columns: 40px 6fr 4fr 120px 50px;
+    padding: 0 16px 8px 45px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    color: var(--color-text-secondary);
-    font-size: 0.85rem;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+    color: var(--color-text-muted);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
 }
 
 .playlist-row {
     display: grid;
-    grid-template-columns: 40px 6fr 4fr 1fr;
+    grid-template-columns: 40px 6fr 4fr 125px 10px;
     align-items: center;
-    padding: 8px 16px;
+    padding: 10px 16px;
     border-radius: 4px;
     cursor: pointer;
     transition: background-color 0.2s ease;
@@ -324,8 +315,8 @@ body:not(.dark-theme) .playlist-row:hover {
 
 .col-index {
     display: flex;
-    justify-content: center;
-    width: 16px;
+    justify-content: flex-start;
+    align-items: center;
 }
 
 /* Text Colors in Rows */
@@ -380,10 +371,15 @@ body.dark-theme .playlist-row:hover .col-album {
     overflow: hidden;
 }
 
+/* Text specific color overrides can stay here if needed */
 .song-title-text {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    color: var(--color-text-primary);
+    font-weight: 500;
+}
+
+.song-artist-text {
+    font-size: 0.85rem;
+    color: var(--color-text-secondary);
 }
 
 .col-album {

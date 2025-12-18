@@ -41,6 +41,18 @@ const userSchema = new mongoose.Schema({
             ref: "Song",
         },
     ],
+    recentlyPlayed: [
+        {
+            song: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Song",
+            },
+            playedAt: {
+                type: Date,
+                default: Date.now,
+            },
+        },
+    ],
 });
 
 module.exports = mongoose.model("User", userSchema);

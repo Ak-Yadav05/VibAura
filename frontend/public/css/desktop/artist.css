@@ -11,17 +11,12 @@
 
 /* LIGHT MODE: Default surface color */
 .artist-page {
-    background: var(--color-background-surface) !important;
+    background: var(--color-view-artist-bg) !important;
 }
 
 /* DARK MODE: Adaptive Gradient - Seamless Transition */
 body.dark-theme .artist-page {
-    /* Layered Background: 
-       1. Gradient from Dynamic Color to Transparent (Top)
-       2. Solid Surface Color (Bottom) */
-    background:
-        linear-gradient(to bottom, var(--dynamic-bg) 0%, rgba(0, 0, 0, 0) 600px),
-        var(--color-background-surface) !important;
+    background: var(--color-view-artist-bg) !important;
     background-blend-mode: normal;
 }
 
@@ -39,16 +34,13 @@ body.dark-theme .artist-page {
 
 /* LIGHT MODE: Theme Gradient */
 .artist-header-dynamic {
-    background: linear-gradient(135deg, var(--color-gradient-start), var(--color-gradient-end));
+    background: var(--color-view-artist-bg);
     color: var(--color-text-primary);
 }
 
 /* DARK MODE: Smoother overlay for better text contrast */
 body.dark-theme .artist-header-dynamic {
-    background: linear-gradient(to bottom,
-            transparent 0%,
-            rgba(0, 0, 0, 0.2) 60%,
-            rgba(0, 0, 0, 0.6) 100%);
+    background: var(--color-view-artist-bg);
     color: var(--dynamic-text);
 }
 
@@ -131,13 +123,13 @@ body.dark-theme .verified-icon {
 
 /* LIGHT MODE STUCK */
 .artist-sticky-group.stuck {
-    background-color: var(--color-background-surface) !important;
+    background-color: var(--color-view-artist-bg) !important;
     color: var(--color-text-primary);
 }
 
 /* DARK MODE STUCK */
 body.dark-theme .artist-sticky-group.stuck {
-    background-color: var(--dynamic-bg, #121212) !important;
+    background-color: var(--color-view-artist-bg) !important;
     color: var(--dynamic-text);
 }
 
@@ -258,9 +250,9 @@ body.dark-theme .section-title {
 
 .artist-row {
     display: grid;
-    grid-template-columns: 40px 6fr 4fr 1fr;
+    grid-template-columns: 40px 6fr 4fr 100px 50px;
     align-items: center;
-    padding: 8px 16px;
+    padding: 4px 16px;
     border-radius: 4px;
     cursor: pointer;
     transition: background-color 0.2s ease;

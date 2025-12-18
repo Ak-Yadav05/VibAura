@@ -30,13 +30,27 @@
 @import url("./playlist.css");
 
 
-/* DISABLE CONTEXT MENU ON IMAGES FOR LONG PRESS */
-img,
-.card,
-.card img {
+/* 
+   GLOBAL MOBILE SUPPRESSION 
+   Disables native context menus and selection app-wide for a native feel.
+*/
+* {
   -webkit-touch-callout: none !important;
   -webkit-user-select: none !important;
+  -khtml-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
   user-select: none !important;
+}
+
+/* Allow text selection in inputs and textareas for accessibility */
+input,
+textarea {
+  -webkit-user-select: text !important;
+  -khtml-user-select: text !important;
+  -moz-user-select: text !important;
+  -ms-user-select: text !important;
+  user-select: text !important;
 }
 
 /**

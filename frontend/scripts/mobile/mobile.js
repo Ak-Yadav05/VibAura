@@ -11,11 +11,22 @@
  */
 
 window.addEventListener("DOMContentLoaded", function () {
-  // Mobile-specific initialization code can be added here in the future
-  // Current mobile UI uses bottom navigation and doesn't require special handling
+  /**
+   * GLOBAL CONTEXT MENU SUPPRESSION
+   * Blocks the native browser context menu app-wide on mobile devices.
+   */
+  const handleContextMenu = (e) => {
+    // Only prevent if not on an input field (to allow copy/paste/editing)
+    if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }
+  };
+
+  if (window.innerWidth <= 768) {
+    document.addEventListener('contextmenu', handleContextMenu, { capture: true });
+  }
 
   const libraryMenu = document.getElementById("libraryMenu");
-
-  // Module is functional but currently minimal as mobile navigation
-  // is handled through responsive CSS and standard link navigation (#hash changes).
 });

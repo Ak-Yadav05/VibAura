@@ -74,6 +74,7 @@ body.dark-theme {
 /* Playlist Action Buttons */
 .icon-edit,
 .icon-trash,
-.icon-save {
+.icon-save,
+.icon-sort {
     filter: var(--icon-filter);
 }
